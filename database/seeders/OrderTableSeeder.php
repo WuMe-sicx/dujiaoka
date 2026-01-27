@@ -1,5 +1,7 @@
 <?php
 
+namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 
 class OrderTableSeeder extends Seeder
@@ -11,6 +13,6 @@ class OrderTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(\App\Models\Order::class, 50)->create();
+        \App\Models\Order::factory(50)->create();
     }
 }

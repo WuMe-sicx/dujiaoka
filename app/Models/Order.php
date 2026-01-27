@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use App\Events\OrderUpdated;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Order extends BaseModel
 {
 
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'orders';
 
