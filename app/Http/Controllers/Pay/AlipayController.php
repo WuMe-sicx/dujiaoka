@@ -21,17 +21,29 @@ class AlipayController extends PayController
         try {
             // 加载网关
             $this->loadGateWay($orderSN, $payway);
+            // v3 配置格式：嵌套在 alipay.default 中
             $config = [
-                'app_id' => $this->payGateway->merchant_id,
-                'ali_public_key' => $this->payGateway->merchant_key,
-                'private_key' => $this->payGateway->merchant_pem,
-                'notify_url' => url($this->payGateway->pay_handleroute . '/notify_url'),
-                'return_url' => url('detail-order-sn', ['orderSN' => $this->order->order_sn]),
-                'http' => [ // optional
-                    'timeout' => 10.0,
-                    'connect_timeout' => 10.0,
+                'alipay' => [
+                    'default' => [
+                        'app_id' => $this->payGateway->merchant_id,
+                        'app_secret_cert' => $this->payGateway->merchant_pem,
+                        'app_public_cert_path' => '', // 如果使用证书模式需配置
+                        'alipay_public_cert_path' => '', // 如果使用证书模式需配置
+                        'alipay_root_cert_path' => '', // 如果使用证书模式需配置
+                        'notify_url' => url($this->payGateway->pay_handleroute . '/notify_url'),
+                        'return_url' => url('detail-order-sn', ['orderSN' => $this->order->order_sn]),
+                        'mode' => 'normal', // normal: 正式环境, dev: 沙箱环境
+                        'http' => [
+                            'timeout' => 10.0,
+                            'connect_timeout' => 10.0,
+                        ],
+                    ],
                 ],
             ];
+
+            // v3: 先配置
+            Pay::config($config);
+
             $order = [
                 'out_trade_no' => $this->order->order_sn,
                 'total_amount' => (float)$this->order->actual_price,
@@ -41,7 +53,8 @@ class AlipayController extends PayController
                 case 'zfbf2f':
                 case 'alipayscan':
                     try{
-                        $result = Pay::alipay($config)->scan($order)->toArray();
+                        // v3: 后调用，无需传递 config
+                        $result = Pay::alipay()->scan($order)->toArray();
                         $result['payname'] = $this->order->order_sn;
                         $result['actual_price'] = (float)$this->order->actual_price;
                         $result['orderid'] = $this->order->order_sn;
@@ -52,14 +65,16 @@ class AlipayController extends PayController
                     }
                 case 'aliweb':
                     try{
-                        $result = Pay::alipay($config)->web($order);
+                        // v3: 后调用，无需传递 config
+                        $result = Pay::alipay()->web($order);
                         return $result;
                     } catch (\Exception $e) {
                         return $this->err(__('dujiaoka.prompt.abnormal_payment_channel') . $e->getMessage());
                     }
                 case 'aliwap':
                     try{
-                        $result = Pay::alipay($config)->wap($order);
+                        // v3: 后调用，无需传递 config
+                        $result = Pay::alipay()->wap($order);
                         return $result;
                     } catch (\Exception $e) {
                         return $this->err(__('dujiaoka.prompt.abnormal_payment_channel') . $e->getMessage());
@@ -88,15 +103,27 @@ class AlipayController extends PayController
         if($payGateway->pay_handleroute != '/pay/alipay'){
             return 'fail';
         }
+
+        // v3 配置格式
         $config = [
-            'app_id' => $payGateway->merchant_id,
-            'ali_public_key' => $payGateway->merchant_key,
-            'private_key' => $payGateway->merchant_pem,
+            'alipay' => [
+                'default' => [
+                    'app_id' => $payGateway->merchant_id,
+                    'app_secret_cert' => $payGateway->merchant_pem,
+                    'app_public_cert_path' => '',
+                    'alipay_public_cert_path' => '',
+                    'alipay_root_cert_path' => '',
+                ],
+            ],
         ];
-        $pay = Pay::alipay($config);
+
+        // v3: 先配置
+        Pay::config($config);
+
         try{
-            // 验证签名
-            $result = $pay->verify();
+            // v3: 使用 callback() 代替 verify()
+            $result = Pay::alipay()->callback($request);
+
             if ($result->trade_status == 'TRADE_SUCCESS' || $result->trade_status == 'TRADE_FINISHED') {
                 $this->orderProcessService->completedOrder($result->out_trade_no, $result->total_amount, $result->trade_no);
             }
