@@ -11,7 +11,7 @@
         "php": "^8.2",
         "torann/currency": "~1.1.5",
         "dcat/easy-excel": "^1.0",
-        "dcat/laravel-admin": "2.*",
+        "printnow/laravel-admin": "@dev",
         "jenssegers/agent": "^2.6",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.5",

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c85e9c0de93b6918977508e95d84d979",
+    "content-hash": "3b2dc547b92cb47574f1dd9637fd8564",
     "packages": [
         {
             "name": "apimatic/core",
@@ -589,77 +589,6 @@
                 "source": "https://github.com/jqhph/easy-excel/tree/1.1.0"
             },
             "time": "2022-03-03T03:04:13+00:00"
-        },
-        {
-            "name": "dcat/laravel-admin",
-            "version": "2.0.x-dev",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/jqhph/dcat-admin.git",
-                "reference": "315658a8f9b079a3ff018ad386f3738869cb44bb"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/jqhph/dcat-admin/zipball/315658a8f9b079a3ff018ad386f3738869cb44bb",
-                "reference": "315658a8f9b079a3ff018ad386f3738869cb44bb",
-                "shasum": ""
-            },
-            "require": {
-                "dcat/easy-excel": "*",
-                "doctrine/dbal": "^2.6|^3.0|^4.0",
-                "laravel/framework": "~5.5|~6.0|~7.0|~8.0|~9.0|~10.0|~11.0|~12.0",
-                "php": ">=7.1.0",
-                "spatie/eloquent-sortable": "3.*|4.*"
-            },
-            "require-dev": {
-                "fakerphp/faker": "^1.23",
-                "laravel/dusk": "~5.9|~6|~7.0|~8.0",
-                "mockery/mockery": "^1.6",
-                "phpstan/phpstan": "^0.12.0|~1.0",
-                "phpunit/phpunit": "^7.5|~9|~10|~11"
-            },
-            "default-branch": true,
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Dcat\\Admin\\AdminServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "files": [
-                    "src/Support/helpers.php"
-                ],
-                "psr-4": {
-                    "Dcat\\Admin\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "jqh",
-                    "email": "841324345@qq.com"
-                }
-            ],
-            "description": "dcat admin",
-            "homepage": "https://github.com/jqhph/dcat-admin",
-            "keywords": [
-                "admin",
-                "dcat",
-                "form",
-                "grid",
-                "laravel",
-                "laravel admin"
-            ],
-            "support": {
-                "issues": "https://github.com/jqhph/dcat-admin/issues",
-                "source": "https://github.com/jqhph/dcat-admin/tree/2.0"
-            },
-            "time": "2025-06-25T03:20:07+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
@@ -3794,6 +3723,84 @@
                 }
             ],
             "time": "2025-12-27T19:41:33+00:00"
+        },
+        {
+            "name": "printnow/laravel-admin",
+            "version": "2.3.9-beta",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PrintNow/dcat-admin.git",
+                "reference": "4390a8f494c20910828e7c93513d13032f0d01dd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PrintNow/dcat-admin/zipball/4390a8f494c20910828e7c93513d13032f0d01dd",
+                "reference": "4390a8f494c20910828e7c93513d13032f0d01dd",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/dbal": "~3.0|~4.0",
+                "ext-dom": "*",
+                "ext-fileinfo": "*",
+                "ext-libxml": "*",
+                "ext-zip": "*",
+                "laravel/framework": "~10.0|~11.0|~12.0",
+                "php": ">=8.1",
+                "spatie/eloquent-sortable": "4.*"
+            },
+            "require-dev": {
+                "fakerphp/faker": "^1.24",
+                "laravel/dusk": "^8.3",
+                "mockery/mockery": "^1.6",
+                "phpstan/phpstan": "^2.1",
+                "phpunit/phpunit": "^12.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Dcat\\Admin\\AdminServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/Support/helpers.php"
+                ],
+                "psr-4": {
+                    "Dcat\\Admin\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Shine",
+                    "email": "i@nowtime.cc"
+                },
+                {
+                    "name": "jqh",
+                    "email": "841324345@qq.com"
+                }
+            ],
+            "description": "Dcat admin 永久分叉版 / 支持 Laravel 12, PHP 版本限制 >= 8.1（支持 PHP 8.4）",
+            "homepage": "https://github.com/PrintNow/dcat-admin",
+            "keywords": [
+                "admin",
+                "dcat",
+                "dcat admin",
+                "form",
+                "grid",
+                "laravel",
+                "laravel admin"
+            ],
+            "support": {
+                "issues": "https://github.com/PrintNow/dcat-admin/issues",
+                "source": "https://github.com/PrintNow/dcat-admin/tree/2.3.9-beta"
+            },
+            "time": "2025-08-02T08:46:52+00:00"
         },
         {
             "name": "psr/cache",
@@ -10051,7 +10058,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": {
+        "printnow/laravel-admin": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
