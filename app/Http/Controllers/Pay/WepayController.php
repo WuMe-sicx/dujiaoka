@@ -14,17 +14,29 @@ class WepayController extends PayController
         try {
             // 加载网关
             $this->loadGateWay($orderSN, $payway);
+            // v3 配置格式：嵌套在 wechat.default 中
             $config = [
-                'app_id' => $this->payGateway->merchant_id,
-                'mch_id' => $this->payGateway->merchant_key,
-                'key' => $this->payGateway->merchant_pem,
-                'notify_url' => url($this->payGateway->pay_handleroute . '/notify_url'),
-                'return_url' => url('detail-order-sn', ['orderSN' => $this->order->order_sn]),
-                'http' => [ // optional
-                    'timeout' => 10.0,
-                    'connect_timeout' => 10.0,
+                'wechat' => [
+                    'default' => [
+                        'app_id' => $this->payGateway->merchant_id,
+                        'mch_id' => $this->payGateway->merchant_key,
+                        'mch_secret_key' => $this->payGateway->merchant_pem,
+                        'mch_secret_cert' => '', // 如果使用证书需配置
+                        'mch_public_cert_path' => '', // 如果使用证书需配置
+                        'notify_url' => url($this->payGateway->pay_handleroute . '/notify_url'),
+                        'return_url' => url('detail-order-sn', ['orderSN' => $this->order->order_sn]),
+                        'mode' => 'normal', // normal: 正式环境, dev: 沙箱环境
+                        'http' => [
+                            'timeout' => 10.0,
+                            'connect_timeout' => 10.0,
+                        ],
+                    ],
                 ],
             ];
+
+            // v3: 先配置
+            Pay::config($config);
+
             $order = [
                 'out_trade_no' => $this->order->order_sn,
                 'total_fee' => bcmul($this->order->actual_price, 100, 0),
@@ -33,7 +45,8 @@ class WepayController extends PayController
             switch ($payway){
                 case 'wescan':
                     try{
-                        $result = Pay::wechat($config)->scan($order)->toArray();
+                        // v3: 后调用，无需传递 config
+                        $result = Pay::wechat()->scan($order)->toArray();
                         $result['qr_code'] = $result['code_url'];
                         $result['payname'] =$this->payGateway->pay_name;
                         $result['actual_price'] = (float)$this->order->actual_price;
@@ -69,15 +82,27 @@ class WepayController extends PayController
         if($payGateway->pay_handleroute != '/pay/wepay'){
             return 'error';
         }
+
+        // v3 配置格式
         $config = [
-            'app_id' => $payGateway->merchant_id,
-            'mch_id' => $payGateway->merchant_key,
-            'key' => $payGateway->merchant_pem,
+            'wechat' => [
+                'default' => [
+                    'app_id' => $payGateway->merchant_id,
+                    'mch_id' => $payGateway->merchant_key,
+                    'mch_secret_key' => $payGateway->merchant_pem,
+                    'mch_secret_cert' => '',
+                    'mch_public_cert_path' => '',
+                ],
+            ],
         ];
-        $pay = Pay::wechat($config);
+
+        // v3: 先配置
+        Pay::config($config);
+
         try{
-            // 验证签名
-            $result = $pay->verify();
+            // v3: 使用 callback() 代替 verify()
+            $result = Pay::wechat()->callback();
+
             $total_fee = bcdiv($result->total_fee, 100, 2);
             $this->orderProcessService->completedOrder($result->out_trade_no, $total_fee, $result->transaction_id);
             return 'success';
