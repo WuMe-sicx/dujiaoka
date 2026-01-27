@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Pay;
 
 
-use AmrShawky\LaravelCurrency\Facade\Currency;
+use Torann\Currency\Facades\Currency;
 use App\Exceptions\RuleValidationException;
 use App\Http\Controllers\PayController;
 use Illuminate\Http\Request;
@@ -40,12 +40,8 @@ class PaypalPayController extends PayController
             $paypal->setConfig(['mode' => 'live']);
             $product = $this->order->title;
             // 得到汇率
-            $total = Currency::convert()
-                ->from('CNY')
-                ->to('USD')
-                ->amount($this->order->actual_price)
-                ->round(2)
-                ->get();
+            $total = Currency::convert($this->order->actual_price, 'CNY', 'USD');
+            $total = round($total, 2);
             $shipping = 0;
             $description = $this->order->title;
             $payer = new Payer();

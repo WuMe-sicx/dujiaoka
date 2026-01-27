@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\BaseModel;
 use Closure;
-use Germey\Geetest\GeetestServiceProvider;
+use Zbrettonye\Geetest\GeetestServiceProvider;
 
 class DujiaoBoot
 {
@@ -48,7 +48,7 @@ class DujiaoBoot
             ];
             // 覆盖 配置
             config([
-                'geetest'  =>  array_merge(config('mail'), $geetestConfig)
+                'geetest'  =>  array_merge(config('geetest'), $geetestConfig)
             ]);
             // 重新注册服务
             (new GeetestServiceProvider(app()))->register();

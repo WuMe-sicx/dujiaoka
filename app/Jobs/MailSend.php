@@ -58,26 +58,26 @@ class MailSend implements ShouldQueue
         $body = $this->content;
         $title = $this->title;
         $sysConfig = cache('system-setting');
-        $mailConfig = [
-            'driver' => $sysConfig['driver'] ?? 'smtp',
-            'host' => $sysConfig['host'] ?? '',
-            'port' => $sysConfig['port'] ?? '465',
-            'username' => $sysConfig['username'] ?? '',
-            'from'      =>  [
-                'address'   =>   $sysConfig['from_address'] ?? '',
-                'name'      =>  $sysConfig['from_name'] ?? '独角发卡'
-            ],
-            'password' => $sysConfig['password'] ?? '',
-            'encryption' => $sysConfig['encryption'] ?? ''
-        ];
-        $to = $this->to;
-        //  覆盖 mail 配置
+
+        // Laravel 9 邮件配置使用嵌套结构
         config([
-            'mail'  =>  array_merge(config('mail'), $mailConfig)
+            'mail.default' => $sysConfig['driver'] ?? 'smtp',
+            'mail.mailers.smtp.host' => $sysConfig['host'] ?? '',
+            'mail.mailers.smtp.port' => $sysConfig['port'] ?? '465',
+            'mail.mailers.smtp.username' => $sysConfig['username'] ?? '',
+            'mail.mailers.smtp.password' => $sysConfig['password'] ?? '',
+            'mail.mailers.smtp.encryption' => $sysConfig['encryption'] ?? '',
+            'mail.from' => [
+                'address' => $sysConfig['from_address'] ?? '',
+                'name' => $sysConfig['from_name'] ?? '独角发卡',
+            ],
         ]);
-        // 重新注册驱动
-        (new MailServiceProvider(app()))->register();
-        Mail::send(['html' => 'email.mail'], ['body' => $body], function ($message) use ($to, $title){
+
+        $to = $this->to;
+
+        // 不再需要重新注册 MailServiceProvider
+        // Laravel 9 中 config 变更会自动生效
+        Mail::send(['html' => 'email.mail'], ['body' => $body], function ($message) use ($to, $title) {
             $message->to($to)->subject($title);
         });
     }
