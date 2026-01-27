@@ -2,14 +2,59 @@
 
 <p align="center">
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license MIT"></a>
-<a href="https://github.com/assimon/dujiaoka/releases/tag/2.0.4"><img src="https://img.shields.io/badge/version-2.0.4-red" alt="version 2.0.4"></a>
-<a href="https://www.php.net/releases/7_4_0.php"><img src="https://img.shields.io/badge/PHP-7.4-lightgrey" alt="php74"></a>
+<a href="https://github.com/WuMe-sicx/dujiaoka/releases/tag/v3.2.1-fix-package-versions"><img src="https://img.shields.io/badge/version-3.2.1-red" alt="version 3.2.1"></a>
+<a href="https://www.php.net/releases/8_2_0.php"><img src="https://img.shields.io/badge/PHP-8.2-blue" alt="php82"></a>
+<a href="https://laravel.com/docs/12.x"><img src="https://img.shields.io/badge/Laravel-12.x-orange" alt="Laravel 12"></a>
 <a href="https://shang.qq.com/wpa/qunwpa?idkey=37b6b06f7c941dae20dcd5784088905d6461064d7f33478692f0c4215546cee0"><img src="https://img.shields.io/badge/QQ%E7%BE%A4-568679748-green" alt="QQ群：568679748"></a>
 </p>
 
 ## 独角数卡
 
 开源式站长自动化售货解决方案、高效、稳定、快速！
+
+## 🎉 重大更新 (2026-01-28)
+
+本 Fork 版本已成功升级到 **Laravel 12** + **PHP 8.2**！
+
+### ✨ 主要更新内容
+
+- ✅ **Laravel 6 → 12 完整升级路径** (6→7→8→9→10→11→12)
+- ✅ **PHP 8.2 完全支持** (从 PHP 7.4 升级)
+- ✅ **Dcat Admin 迁移** (dcat/laravel-admin → printnow/laravel-admin)
+- ✅ **支付包现代化**:
+  - yansongda/pay v2 → v3 (支付宝/微信)
+  - PayPal REST API SDK → PayPal Server SDK 2.2.0
+  - stripe/stripe-php v7 → v19
+- ✅ **安全更新**: 修复所有已知安全漏洞
+- ✅ **性能优化**: Laravel 12 带来的性能提升
+
+### 📦 版本标签
+
+- `v2.1.0-laravel7` - Laravel 7 升级
+- `v2.2.0-laravel8` - Laravel 8 升级
+- `v2.3.0-laravel9` - Laravel 9 升级
+- `v2.4.0-laravel10` - Laravel 10 升级
+- `v2.5.0-laravel11` - Laravel 11 升级
+- `v3.0.0-laravel12` - Laravel 12 升级
+- `v3.0.1-security-update` - 安全修复
+- `v3.2.0-payment-migration` - 支付包迁移
+- `v3.2.1-fix-package-versions` - 依赖版本修正 ⭐ 最新
+
+### 📚 升级文档
+
+详细的升级步骤和文档请查看:
+- [升级计划文档](升级.md) - 完整的 6→12 升级指南
+- [包版本修正记录](COMPOSER_VERSION_FIX.md) - 依赖包修正详情
+
+### ⚠️ 环境要求变化
+
+**新版本要求:**
+- PHP >= 8.2 (原 7.4)
+- Laravel 12.x (原 6.x)
+- MySQL >= 5.6 (不变)
+- Redis (不变)
+
+---
 
 - 框架来自：[laravel/framework](https://github.com/laravel/laravel).
 - 后台管理系统：[laravel-admin](https://laravel-admin.org/).
@@ -91,20 +136,23 @@ Telegram: [https://t.me/dujiaoka](https://t.me/dujiaoka)
 
 ## 基本环境要求
 
-- (PHP + PHPCLI) version = 7.4
+- **(PHP + PHPCLI) version >= 8.2** ⚠️ 已更新
+- **Laravel version = 12.x** ⚠️ 已更新
 - Nginx version >= 1.16
 - MYSQL version >= 5.6
 - Redis (高性能缓存服务)
 - Supervisor (一个python编写的进程管理服务)
 - Composer (PHP包管理器)
-- Linux (Win下未测试，建议直接Linux)
+- Linux (推荐，Windows 未完全测试)
 
 ## PHP环境要求
 
 星号(*)为必须执行的要求，其他为建议内容
 
+- **\*PHP版本 >= 8.2** ⚠️ 必须
 - **\*安装`fileinfo`扩展**
 - **\*安装`redis`扩展**
+- **\*安装`gd`扩展** (二维码生成)
 - **\*终端需支持`php-cli`，测试`php -v`(版本必须一致)**
 - **\*需要开启的函数：`putenv`，`proc_open`，`pcntl_signal`，`pcntl_alarm`**
 - 安装`opcache`扩展
