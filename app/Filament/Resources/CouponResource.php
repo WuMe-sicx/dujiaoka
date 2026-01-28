@@ -55,39 +55,39 @@ class CouponResource extends Resource
         return $schema
             ->components([
                 Forms\Components\Select::make('goods')
-                    ->label('Applicable Products')
+                    ->label('适用商品')
                     ->multiple()
                     ->relationship('goods', 'gd_name')
                     ->preload()
                     ->searchable(),
 
                 Forms\Components\TextInput::make('discount')
-                    ->label('Discount Amount')
+                    ->label('折扣金额')
                     ->numeric()
                     ->prefix('¥')
                     ->default(0)
                     ->required(),
 
                 Forms\Components\TextInput::make('coupon')
-                    ->label('Coupon Code')
+                    ->label('优惠券代码')
                     ->required()
                     ->maxLength(255),
 
                 Forms\Components\TextInput::make('ret')
-                    ->label('Remaining Uses')
+                    ->label('剩余使用次数')
                     ->numeric()
                     ->default(1),
 
                 Forms\Components\Radio::make('is_use')
-                    ->label('Status')
+                    ->label('状态')
                     ->options([
-                        Coupon::STATUS_UNUSED => 'Unused',
-                        Coupon::STATUS_USE => 'Used',
+                        Coupon::STATUS_UNUSED => '未使用',
+                        Coupon::STATUS_USE => '已使用',
                     ])
                     ->default(Coupon::STATUS_UNUSED),
 
                 Forms\Components\Toggle::make('is_open')
-                    ->label('Enabled')
+                    ->label('启用')
                     ->default(true),
             ]);
     }
@@ -101,48 +101,48 @@ class CouponResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('coupon')
-                    ->label('Coupon Code')
+                    ->label('优惠券代码')
                     ->searchable()
                     ->copyable(),
 
                 Tables\Columns\TextColumn::make('discount')
-                    ->label('Discount')
+                    ->label('折扣')
                     ->money('CNY')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('is_use')
-                    ->label('Status')
+                    ->label('状态')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => $state == Coupon::STATUS_UNUSED ? 'Unused' : 'Used')
+                    ->formatStateUsing(fn ($state) => $state == Coupon::STATUS_UNUSED ? '未使用' : '已使用')
                     ->color(fn ($state) => $state == Coupon::STATUS_UNUSED ? 'success' : 'danger'),
 
                 Tables\Columns\ToggleColumn::make('is_open')
-                    ->label('Enabled'),
+                    ->label('启用'),
 
                 Tables\Columns\TextColumn::make('ret')
-                    ->label('Remaining'),
+                    ->label('剩余次数'),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Created At')
+                    ->label('创建时间')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Updated At')
+                    ->label('更新时间')
                     ->dateTime()
                     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('is_use')
-                    ->label('Status')
+                    ->label('状态')
                     ->options([
-                        Coupon::STATUS_UNUSED => 'Unused',
-                        Coupon::STATUS_USE => 'Used',
+                        Coupon::STATUS_UNUSED => '未使用',
+                        Coupon::STATUS_USE => '已使用',
                     ]),
                 Tables\Filters\SelectFilter::make('goods')
-                    ->label('Product')
+                    ->label('商品')
                     ->relationship('goods', 'gd_name')
                     ->searchable()
                     ->preload(),

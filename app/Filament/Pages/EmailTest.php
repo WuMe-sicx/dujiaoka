@@ -30,6 +30,11 @@ class EmailTest extends Page implements HasForms
         return '邮件测试';
     }
 
+    public function getTitle(): string
+    {
+        return '邮件测试';
+    }
+
     public static function getNavigationGroup(): ?string
     {
         return '系统配置';
@@ -56,16 +61,16 @@ class EmailTest extends Page implements HasForms
                     ->description('使用系统设置中的 SMTP 配置发送测试邮件')
                     ->schema([
                         Forms\Components\TextInput::make('to')
-                            ->label('Recipient Email')
+                            ->label('收件人邮箱')
                             ->email()
                             ->required(),
 
                         Forms\Components\TextInput::make('title')
-                            ->label('Subject')
+                            ->label('主题')
                             ->required(),
 
                         Forms\Components\RichEditor::make('body')
-                            ->label('Email Body')
+                            ->label('邮件正文')
                             ->required()
                             ->columnSpanFull(),
                     ])->columns(2),
@@ -100,12 +105,12 @@ class EmailTest extends Page implements HasForms
             });
 
             Notification::make()
-                ->title('Email sent successfully!')
+                ->title('邮件发送成功！')
                 ->success()
                 ->send();
         } catch (\Exception $e) {
             Notification::make()
-                ->title('Failed to send email')
+                ->title('邮件发送失败')
                 ->body($e->getMessage())
                 ->danger()
                 ->send();

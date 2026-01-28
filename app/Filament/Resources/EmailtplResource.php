@@ -54,19 +54,19 @@ class EmailtplResource extends Resource
         return $schema
             ->components([
                 Forms\Components\TextInput::make('tpl_name')
-                    ->label('Template Name')
+                    ->label('模板名称')
                     ->required()
                     ->maxLength(255),
 
                 Forms\Components\TextInput::make('tpl_token')
-                    ->label('Token')
+                    ->label('令牌')
                     ->required()
                     ->maxLength(255)
                     ->disabled(fn ($record) => $record !== null)
                     ->dehydrated(fn ($record) => $record === null),
 
                 Forms\Components\RichEditor::make('tpl_content')
-                    ->label('Content')
+                    ->label('内容')
                     ->required()
                     ->columnSpanFull(),
             ]);
@@ -81,22 +81,22 @@ class EmailtplResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('tpl_name')
-                    ->label('Template Name')
+                    ->label('模板名称')
                     ->searchable()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('tpl_token')
-                    ->label('Token')
+                    ->label('令牌')
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Created At')
+                    ->label('创建时间')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Updated At')
+                    ->label('更新时间')
                     ->dateTime()
                     ->sortable(),
             ])

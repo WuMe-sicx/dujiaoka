@@ -15,9 +15,9 @@ class ListCarmis extends ListRecords
         return [
             Actions\CreateAction::make(),
             Actions\Action::make('import')
-                ->label('Import Keys')
+                ->label('导入卡密')
                 ->icon('heroicon-o-arrow-up-tray')
-                ->url(fn () => route('filament.filament.pages.import-carmis'))
+                ->url(fn () => route('filament.admin.pages.import-carmis'))
                 ->color('success'),
         ];
     }

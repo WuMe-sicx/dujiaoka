@@ -62,94 +62,94 @@ class OrderResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Order Info')
+                Section::make('订单信息')
                     ->schema([
                         Forms\Components\TextInput::make('order_sn')
-                            ->label('Order SN')
+                            ->label('订单号')
                             ->disabled(),
 
                         Forms\Components\TextInput::make('title')
-                            ->label('Title'),
+                            ->label('标题'),
 
                         Forms\Components\Placeholder::make('goods_name')
-                            ->label('Product')
+                            ->label('商品')
                             ->content(fn ($record) => $record?->goods?->gd_name ?? '-'),
 
                         Forms\Components\Placeholder::make('pay_name')
-                            ->label('Payment')
+                            ->label('支付方式')
                             ->content(fn ($record) => $record?->pay?->pay_name ?? '-'),
 
                         Forms\Components\TextInput::make('email')
-                            ->label('Email')
+                            ->label('邮箱')
                             ->disabled(),
 
                         Forms\Components\TextInput::make('buy_ip')
-                            ->label('IP')
+                            ->label('IP 地址')
                             ->disabled(),
                     ])->columns(2),
 
-                Section::make('Pricing')
+                Section::make('定价')
                     ->schema([
                         Forms\Components\TextInput::make('goods_price')
-                            ->label('Unit Price')
+                            ->label('单价')
                             ->disabled(),
 
                         Forms\Components\TextInput::make('buy_amount')
-                            ->label('Quantity')
+                            ->label('数量')
                             ->disabled(),
 
                         Forms\Components\TextInput::make('total_price')
-                            ->label('Total')
+                            ->label('总计')
                             ->disabled(),
 
                         Forms\Components\Placeholder::make('coupon_name')
-                            ->label('Coupon')
+                            ->label('优惠券')
                             ->content(fn ($record) => $record?->coupon?->coupon ?? '-'),
 
                         Forms\Components\TextInput::make('coupon_discount_price')
-                            ->label('Coupon Discount')
+                            ->label('优惠券折扣')
                             ->disabled(),
 
                         Forms\Components\TextInput::make('wholesale_discount_price')
-                            ->label('Wholesale Discount')
+                            ->label('批发折扣')
                             ->disabled(),
 
                         Forms\Components\TextInput::make('actual_price')
-                            ->label('Actual Price')
+                            ->label('实际价格')
                             ->disabled(),
                     ])->columns(3),
 
-                Section::make('Status & Delivery')
+                Section::make('状态与配送')
                     ->schema([
                         Forms\Components\Radio::make('status')
-                            ->label('Order Status')
+                            ->label('订单状态')
                             ->options([
-                                Order::STATUS_WAIT_PAY => 'Wait Pay',
-                                Order::STATUS_PENDING => 'Pending',
-                                Order::STATUS_PROCESSING => 'Processing',
-                                Order::STATUS_COMPLETED => 'Completed',
-                                Order::STATUS_FAILURE => 'Failure',
-                                Order::STATUS_ABNORMAL => 'Abnormal',
-                                Order::STATUS_EXPIRED => 'Expired',
+                                Order::STATUS_WAIT_PAY => '待支付',
+                                Order::STATUS_PENDING => '待处理',
+                                Order::STATUS_PROCESSING => '处理中',
+                                Order::STATUS_COMPLETED => '已完成',
+                                Order::STATUS_FAILURE => '失败',
+                                Order::STATUS_ABNORMAL => '异常',
+                                Order::STATUS_EXPIRED => '已过期',
                             ]),
 
                         Forms\Components\Radio::make('type')
-                            ->label('Delivery Type')
+                            ->label('配送类型')
                             ->options([
-                                Order::AUTOMATIC_DELIVERY => 'Automatic',
-                                Order::MANUAL_PROCESSING => 'Manual',
+                                Order::AUTOMATIC_DELIVERY => '自动',
+                                Order::MANUAL_PROCESSING => '手动',
                             ]),
 
                         Forms\Components\Textarea::make('info')
-                            ->label('Delivery Info')
+                            ->label('配送信息')
                             ->rows(6)
                             ->columnSpanFull(),
 
                         Forms\Components\TextInput::make('search_pwd')
-                            ->label('Search Password'),
+                            ->label('查询密码'),
 
                         Forms\Components\TextInput::make('trade_no')
-                            ->label('Trade No')
+                            ->label('交易号')
                             ->disabled(),
                     ])->columns(2),
             ]);
@@ -164,61 +164,61 @@ class OrderResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('order_sn')
-                    ->label('Order SN')
+                    ->label('订单号')
                     ->searchable()
                     ->copyable(),
 
                 Tables\Columns\TextColumn::make('title')
-                    ->label('Title')
+                    ->label('标题')
                     ->searchable()
                     ->limit(20),
 
                 Tables\Columns\TextColumn::make('type')
-                    ->label('Type')
+                    ->label('类型')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => $state == Order::AUTOMATIC_DELIVERY ? 'Auto' : 'Manual')
+                    ->formatStateUsing(fn ($state) => $state == Order::AUTOMATIC_DELIVERY ? '自动' : '手动')
                     ->color(fn ($state) => $state == Order::AUTOMATIC_DELIVERY ? 'success' : 'info'),
 
                 Tables\Columns\TextColumn::make('email')
-                    ->label('Email')
+                    ->label('邮箱')
                     ->searchable()
                     ->copyable()
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('goods.gd_name')
-                    ->label('Product')
+                    ->label('商品')
                     ->limit(15),
 
                 Tables\Columns\TextColumn::make('actual_price')
-                    ->label('Price')
+                    ->label('价格')
                     ->money('CNY')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('buy_amount')
-                    ->label('Qty'),
+                    ->label('数量'),
 
                 Tables\Columns\TextColumn::make('pay.pay_name')
-                    ->label('Payment')
+                    ->label('支付方式')
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('trade_no')
-                    ->label('Trade No')
+                    ->label('交易号')
                     ->copyable()
                     ->limit(15)
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('status')
-                    ->label('Status')
+                    ->label('状态')
                     ->badge()
                     ->formatStateUsing(fn ($state) => match($state) {
-                        Order::STATUS_WAIT_PAY => 'Wait Pay',
-                        Order::STATUS_PENDING => 'Pending',
-                        Order::STATUS_PROCESSING => 'Processing',
-                        Order::STATUS_COMPLETED => 'Completed',
-                        Order::STATUS_FAILURE => 'Failure',
-                        Order::STATUS_ABNORMAL => 'Abnormal',
-                        Order::STATUS_EXPIRED => 'Expired',
-                        default => 'Unknown',
+                        Order::STATUS_WAIT_PAY => '待支付',
+                        Order::STATUS_PENDING => '待处理',
+                        Order::STATUS_PROCESSING => '处理中',
+                        Order::STATUS_COMPLETED => '已完成',
+                        Order::STATUS_FAILURE => '失败',
+                        Order::STATUS_ABNORMAL => '异常',
+                        Order::STATUS_EXPIRED => '已过期',
+                        default => '未知',
                     })
                     ->color(fn ($state) => match($state) {
                         Order::STATUS_COMPLETED => 'success',
@@ -230,35 +230,35 @@ class OrderResource extends Resource
                     }),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Created')
+                    ->label('创建时间')
                     ->dateTime()
                     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('status')
-                    ->label('Status')
+                    ->label('状态')
                     ->options([
-                        Order::STATUS_WAIT_PAY => 'Wait Pay',
-                        Order::STATUS_PENDING => 'Pending',
-                        Order::STATUS_PROCESSING => 'Processing',
-                        Order::STATUS_COMPLETED => 'Completed',
-                        Order::STATUS_FAILURE => 'Failure',
-                        Order::STATUS_ABNORMAL => 'Abnormal',
-                        Order::STATUS_EXPIRED => 'Expired',
+                        Order::STATUS_WAIT_PAY => '待支付',
+                        Order::STATUS_PENDING => '待处理',
+                        Order::STATUS_PROCESSING => '处理中',
+                        Order::STATUS_COMPLETED => '已完成',
+                        Order::STATUS_FAILURE => '失败',
+                        Order::STATUS_ABNORMAL => '异常',
+                        Order::STATUS_EXPIRED => '已过期',
                     ]),
                 Tables\Filters\SelectFilter::make('type')
-                    ->label('Type')
+                    ->label('类型')
                     ->options([
-                        Order::AUTOMATIC_DELIVERY => 'Automatic',
-                        Order::MANUAL_PROCESSING => 'Manual',
+                        Order::AUTOMATIC_DELIVERY => '自动',
+                        Order::MANUAL_PROCESSING => '手动',
                     ]),
                 Tables\Filters\SelectFilter::make('goods_id')
-                    ->label('Product')
+                    ->label('商品')
                     ->options(Goods::query()->pluck('gd_name', 'id'))
                     ->searchable(),
                 Tables\Filters\SelectFilter::make('pay_id')
-                    ->label('Payment')
+                    ->label('支付方式')
                     ->options(Pay::query()->pluck('pay_name', 'id')),
             ])
             ->actions([

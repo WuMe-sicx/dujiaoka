@@ -54,16 +54,16 @@ class GoodsGroupResource extends Resource
         return $schema
             ->components([
                 Forms\Components\TextInput::make('gp_name')
-                    ->label('Category Name')
+                    ->label('分类名称')
                     ->required()
                     ->maxLength(255),
 
                 Forms\Components\Toggle::make('is_open')
-                    ->label('Status')
+                    ->label('状态')
                     ->default(true),
 
                 Forms\Components\TextInput::make('ord')
-                    ->label('Display Order')
+                    ->label('显示顺序')
                     ->numeric()
                     ->default(1)
                     ->required(),
@@ -79,19 +79,19 @@ class GoodsGroupResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('gp_name')
-                    ->label('Category Name')
+                    ->label('分类名称')
                     ->searchable()
                     ->sortable(),
 
                 Tables\Columns\ToggleColumn::make('is_open')
-                    ->label('Status'),
+                    ->label('状态'),
 
                 Tables\Columns\TextColumn::make('ord')
-                    ->label('Order')
+                    ->label('排序')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Updated At')
+                    ->label('更新时间')
                     ->dateTime()
                     ->sortable(),
             ])

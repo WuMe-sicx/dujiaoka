@@ -30,6 +30,11 @@ class ImportCarmis extends Page implements HasForms
         return '导入卡密';
     }
 
+    public function getTitle(): string
+    {
+        return '导入卡密';
+    }
+
     public static function getNavigationGroup(): ?string
     {
         return '销售管理';
@@ -45,7 +50,7 @@ class ImportCarmis extends Page implements HasForms
         return $schema
             ->components([
                 Forms\Components\Select::make('goods_id')
-                    ->label('Product')
+                    ->label('商品')
                     ->options(
                         Goods::query()
                             ->where('type', Goods::AUTOMATIC_DELIVERY)
@@ -55,19 +60,19 @@ class ImportCarmis extends Page implements HasForms
                     ->searchable(),
 
                 Forms\Components\Textarea::make('carmis_list')
-                    ->label('Digital Keys (one per line)')
+                    ->label('卡密内容（每行一个）')
                     ->rows(15)
-                    ->helperText('Enter digital keys, one per line'),
+                    ->helperText('请输入卡密，每行一个'),
 
                 Forms\Components\FileUpload::make('carmis_txt')
-                    ->label('Or Upload TXT File')
+                    ->label('或上传TXT文件')
                     ->disk('public')
                     ->acceptedFileTypes(['text/plain'])
                     ->maxSize(5120)
-                    ->helperText('Upload a .txt file with keys, one per line'),
+                    ->helperText('上传包含卡密的 .txt 文件，每行一个'),
 
                 Forms\Components\Toggle::make('remove_duplication')
-                    ->label('Remove Duplicates')
+                    ->label('去除重复')
                     ->default(false),
             ])
             ->statePath('data');
@@ -79,7 +84,7 @@ class ImportCarmis extends Page implements HasForms
 
         if (empty($data['carmis_list']) && empty($data['carmis_txt'])) {
             Notification::make()
-                ->title('Please provide keys via text or file upload')
+                ->title('请通过文本输入或文件上传提供卡密')
                 ->danger()
                 ->send();
             return;
@@ -124,7 +129,7 @@ class ImportCarmis extends Page implements HasForms
         }
 
         Notification::make()
-            ->title('Successfully imported ' . count($carmisData) . ' keys')
+            ->title('成功导入 ' . count($carmisData) . ' 条卡密')
             ->success()
             ->send();
 

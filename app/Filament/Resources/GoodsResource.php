@@ -56,117 +56,117 @@ class GoodsResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Basic Information')
+                Section::make('基本信息')
                     ->schema([
                         Forms\Components\TextInput::make('gd_name')
-                            ->label('Product Name')
+                            ->label('商品名称')
                             ->required()
                             ->maxLength(255),
 
                         Forms\Components\TextInput::make('gd_description')
-                            ->label('Short Description')
+                            ->label('简短描述')
                             ->required()
                             ->maxLength(255),
 
                         Forms\Components\TextInput::make('gd_keywords')
-                            ->label('SEO Keywords')
+                            ->label('SEO 关键词')
                             ->required()
                             ->maxLength(255),
 
                         Forms\Components\Select::make('group_id')
-                            ->label('Category')
+                            ->label('分类')
                             ->options(GoodsGroup::query()->pluck('gp_name', 'id'))
                             ->required()
                             ->searchable(),
 
                         Forms\Components\FileUpload::make('picture')
-                            ->label('Product Image')
+                            ->label('商品图片')
                             ->image()
                             ->directory('goods')
                             ->disk('admin'),
 
                         Forms\Components\Radio::make('type')
-                            ->label('Delivery Type')
+                            ->label('配送类型')
                             ->options([
-                                Goods::AUTOMATIC_DELIVERY => 'Automatic Delivery',
-                                Goods::MANUAL_PROCESSING => 'Manual Processing',
+                                Goods::AUTOMATIC_DELIVERY => '自动发货',
+                                Goods::MANUAL_PROCESSING => '手动处理',
                             ])
                             ->default(Goods::AUTOMATIC_DELIVERY)
                             ->required(),
                     ])->columns(2)
                     ->columnSpanFull(),
 
-                Section::make('Pricing')
+                Section::make('定价')
                     ->schema([
                         Forms\Components\TextInput::make('retail_price')
-                            ->label('Original Price')
+                            ->label('原价')
                             ->numeric()
                             ->prefix('¥')
                             ->default(0)
-                            ->helperText('Show as strikethrough price'),
+                            ->helperText('显示为划线价'),
 
                         Forms\Components\TextInput::make('actual_price')
-                            ->label('Actual Price')
+                            ->label('实际价格')
                             ->numeric()
                             ->prefix('¥')
                             ->default(0)
                             ->required(),
 
                         Forms\Components\TextInput::make('in_stock')
-                            ->label('Stock')
+                            ->label('库存')
                             ->numeric()
                             ->default(0)
-                            ->helperText('For auto-delivery products, this is calculated from unsold keys'),
+                            ->helperText('自动发货商品根据未售卡密自动计算'),
 
                         Forms\Components\TextInput::make('sales_volume')
-                            ->label('Sales Volume')
+                            ->label('销量')
                             ->numeric()
                             ->default(0),
 
                         Forms\Components\TextInput::make('buy_limit_num')
-                            ->label('Purchase Limit')
+                            ->label('限购数量')
                             ->numeric()
                             ->default(0)
-                            ->helperText('0 = no limit'),
+                            ->helperText('0 = 不限制'),
 
                         Forms\Components\TextInput::make('ord')
-                            ->label('Display Order')
+                            ->label('显示顺序')
                             ->numeric()
                             ->default(1),
                     ])->columns(3)
                     ->columnSpanFull(),
 
-                Section::make('Content')
+                Section::make('内容')
                     ->schema([
                         Forms\Components\RichEditor::make('buy_prompt')
-                            ->label('Purchase Prompt')
+                            ->label('购买提示')
                             ->columnSpanFull(),
 
                         Forms\Components\RichEditor::make('description')
-                            ->label('Product Description')
+                            ->label('商品描述')
                             ->columnSpanFull(),
                     ])
                     ->columnSpanFull(),
 
-                Section::make('Advanced Configuration')
+                Section::make('高级配置')
                     ->schema([
                         Forms\Components\Textarea::make('wholesale_price_cnf')
-                            ->label('Wholesale Pricing')
+                            ->label('批发价格')
                             ->rows(4)
-                            ->helperText('Format: quantity=price, one per line. e.g., 10=8.5'),
+                            ->helperText('格式：数量=价格，每行一个，如：10=8.5'),
 
                         Forms\Components\Textarea::make('other_ipu_cnf')
-                            ->label('Custom Input Fields')
+                            ->label('自定义输入字段')
                             ->rows(4)
-                            ->helperText('Additional input fields for order, one per line'),
+                            ->helperText('订单附加输入字段，每行一个'),
 
                         Forms\Components\Textarea::make('api_hook')
-                            ->label('API Webhook')
+                            ->label('API 回调')
                             ->rows(4)
-                            ->helperText('Webhook URL to call when order completes'),
+                            ->helperText('订单完成时调用的回调地址'),
 
                         Forms\Components\Toggle::make('is_open')
-                            ->label('Enabled')
+                            ->label('启用')
                             ->default(true),
                     ])->columns(1)
                     ->columnSpanFull(),
@@ -182,33 +182,33 @@ class GoodsResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\ImageColumn::make('picture')
-                    ->label('Image')
+                    ->label('图片')
                     ->disk('admin')
                     ->size(50),
 
                 Tables\Columns\TextColumn::make('gd_name')
-                    ->label('Name')
+                    ->label('名称')
                     ->searchable()
                     ->sortable()
                     ->limit(30),
 
                 Tables\Columns\TextColumn::make('group.gp_name')
-                    ->label('Category')
+                    ->label('分类')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('type')
-                    ->label('Type')
+                    ->label('类型')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => $state == Goods::AUTOMATIC_DELIVERY ? 'Auto' : 'Manual')
+                    ->formatStateUsing(fn ($state) => $state == Goods::AUTOMATIC_DELIVERY ? '自动' : '手动')
                     ->color(fn ($state) => $state == Goods::AUTOMATIC_DELIVERY ? 'success' : 'info'),
 
                 Tables\Columns\TextColumn::make('actual_price')
-                    ->label('Price')
+                    ->label('价格')
                     ->money('CNY')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('in_stock')
-                    ->label('Stock')
+                    ->label('库存')
                     ->state(function (Goods $record): int {
                         if ($record->type == Goods::AUTOMATIC_DELIVERY) {
                             return Carmis::query()
@@ -220,18 +220,18 @@ class GoodsResource extends Resource
                     }),
 
                 Tables\Columns\TextColumn::make('sales_volume')
-                    ->label('Sales')
+                    ->label('销量')
                     ->sortable(),
 
                 Tables\Columns\TextInputColumn::make('ord')
-                    ->label('Order')
+                    ->label('排序')
                     ->sortable(),
 
                 Tables\Columns\ToggleColumn::make('is_open')
-                    ->label('Status'),
+                    ->label('状态'),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Created')
+                    ->label('创建时间')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -239,13 +239,13 @@ class GoodsResource extends Resource
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('type')
-                    ->label('Type')
+                    ->label('类型')
                     ->options([
-                        Goods::AUTOMATIC_DELIVERY => 'Automatic Delivery',
-                        Goods::MANUAL_PROCESSING => 'Manual Processing',
+                        Goods::AUTOMATIC_DELIVERY => '自动发货',
+                        Goods::MANUAL_PROCESSING => '手动处理',
                     ]),
                 Tables\Filters\SelectFilter::make('group_id')
-                    ->label('Category')
+                    ->label('分类')
                     ->options(GoodsGroup::query()->pluck('gp_name', 'id'))
                     ->searchable(),
             ])

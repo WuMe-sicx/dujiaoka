@@ -54,56 +54,56 @@ class PayResource extends Resource
         return $schema
             ->components([
                 Forms\Components\TextInput::make('pay_name')
-                    ->label('Payment Name')
+                    ->label('支付名称')
                     ->required()
                     ->maxLength(255),
 
                 Forms\Components\TextInput::make('pay_check')
-                    ->label('Payment Code')
+                    ->label('支付代码')
                     ->required()
                     ->maxLength(255),
 
                 Forms\Components\TextInput::make('merchant_id')
-                    ->label('Merchant ID')
+                    ->label('商户ID')
                     ->required()
                     ->maxLength(255),
 
                 Forms\Components\Textarea::make('merchant_key')
-                    ->label('Merchant Key')
+                    ->label('商户密钥')
                     ->rows(3),
 
                 Forms\Components\Textarea::make('merchant_pem')
-                    ->label('Merchant PEM')
+                    ->label('商户证书')
                     ->required()
                     ->rows(3),
 
                 Forms\Components\Radio::make('pay_client')
-                    ->label('Client Type')
+                    ->label('客户端类型')
                     ->options([
                         Pay::PAY_CLIENT_PC => 'PC',
-                        Pay::PAY_CLIENT_MOBILE => 'Mobile',
-                        Pay::PAY_CLIENT_ALL => 'All',
+                        Pay::PAY_CLIENT_MOBILE => '移动端',
+                        Pay::PAY_CLIENT_ALL => '全部',
                     ])
                     ->default(Pay::PAY_CLIENT_PC)
                     ->required(),
 
                 Forms\Components\Radio::make('pay_method')
-                    ->label('Payment Method')
+                    ->label('支付方式')
                     ->options([
-                        Pay::METHOD_JUMP => 'Jump/Redirect',
-                        Pay::METHOD_SCAN => 'Scan QR Code',
+                        Pay::METHOD_JUMP => '跳转支付',
+                        Pay::METHOD_SCAN => '扫码支付',
                     ])
                     ->default(Pay::METHOD_JUMP)
                     ->required(),
 
                 Forms\Components\TextInput::make('pay_handleroute')
-                    ->label('Handler Route')
+                    ->label('处理路由')
                     ->required()
                     ->maxLength(255)
                     ->placeholder('/pay/alipay'),
 
                 Forms\Components\Toggle::make('is_open')
-                    ->label('Status')
+                    ->label('状态')
                     ->default(true),
             ]);
     }
@@ -117,51 +117,51 @@ class PayResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('pay_name')
-                    ->label('Payment Name')
+                    ->label('支付名称')
                     ->searchable()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('pay_check')
-                    ->label('Code')
+                    ->label('代码')
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('pay_method')
-                    ->label('Method')
-                    ->formatStateUsing(fn ($state) => $state == Pay::METHOD_JUMP ? 'Jump' : 'Scan'),
+                    ->label('方式')
+                    ->formatStateUsing(fn ($state) => $state == Pay::METHOD_JUMP ? '跳转' : '扫码'),
 
                 Tables\Columns\TextColumn::make('merchant_id')
-                    ->label('Merchant ID')
+                    ->label('商户ID')
                     ->limit(20),
 
                 Tables\Columns\TextColumn::make('pay_client')
-                    ->label('Client')
+                    ->label('客户端')
                     ->formatStateUsing(fn ($state) => match($state) {
                         Pay::PAY_CLIENT_PC => 'PC',
-                        Pay::PAY_CLIENT_MOBILE => 'Mobile',
-                        Pay::PAY_CLIENT_ALL => 'All',
+                        Pay::PAY_CLIENT_MOBILE => '移动端',
+                        Pay::PAY_CLIENT_ALL => '全部',
                         default => $state,
                     }),
 
                 Tables\Columns\TextColumn::make('pay_handleroute')
-                    ->label('Route')
+                    ->label('路由')
                     ->limit(20),
 
                 Tables\Columns\ToggleColumn::make('is_open')
-                    ->label('Status'),
+                    ->label('状态'),
 
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Updated At')
+                    ->label('更新时间')
                     ->dateTime()
                     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('pay_client')
-                    ->label('Client')
+                    ->label('客户端')
                     ->options([
                         Pay::PAY_CLIENT_PC => 'PC',
-                        Pay::PAY_CLIENT_MOBILE => 'Mobile',
-                        Pay::PAY_CLIENT_ALL => 'All',
+                        Pay::PAY_CLIENT_MOBILE => '移动端',
+                        Pay::PAY_CLIENT_ALL => '全部',
                     ]),
             ])
             ->actions([

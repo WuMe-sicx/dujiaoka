@@ -12,11 +12,13 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class FilamentPanelProvider extends PanelProvider
@@ -68,6 +70,32 @@ class FilamentPanelProvider extends PanelProvider
             ->navigationGroups([
                 '销售管理',
                 '系统配置',
-            ]);
+            ])
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn (): HtmlString => new HtmlString('
+                    <style>
+                        /* Compact stat cards */
+                        .fi-wi-stats-overview-stat {
+                            padding: 0.625rem 0.875rem !important;
+                            gap: 0.25rem !important;
+                        }
+                        .fi-wi-stats-overview-stat-value {
+                            font-size: 1.375rem !important;
+                            line-height: 1.1 !important;
+                        }
+                        .fi-wi-stats-overview-stat-label {
+                            font-size: 0.7rem !important;
+                        }
+                        .fi-wi-stats-overview-stat-description {
+                            font-size: 0.65rem !important;
+                            margin-top: 0.125rem !important;
+                        }
+                        .fi-wi-stats-overview-stat-chart {
+                            max-height: 1.5rem !important;
+                        }
+                    </style>
+                ')
+            );
     }
 }

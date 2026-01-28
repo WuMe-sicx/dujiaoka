@@ -55,7 +55,7 @@ class CarmisResource extends Resource
         return $schema
             ->components([
                 Forms\Components\Select::make('goods_id')
-                    ->label('Product')
+                    ->label('商品')
                     ->options(
                         Goods::query()
                             ->where('type', Goods::AUTOMATIC_DELIVERY)
@@ -65,20 +65,20 @@ class CarmisResource extends Resource
                     ->searchable(),
 
                 Forms\Components\Radio::make('status')
-                    ->label('Status')
+                    ->label('状态')
                     ->options([
-                        Carmis::STATUS_UNSOLD => 'Unsold',
-                        Carmis::STATUS_SOLD => 'Sold',
+                        Carmis::STATUS_UNSOLD => '未售出',
+                        Carmis::STATUS_SOLD => '已售出',
                     ])
                     ->default(Carmis::STATUS_UNSOLD),
 
                 Forms\Components\Toggle::make('is_loop')
-                    ->label('Reusable')
-                    ->helperText('If enabled, this key can be sold multiple times')
+                    ->label('可重复使用')
+                    ->helperText('启用后，此密钥可多次出售')
                     ->default(false),
 
                 Forms\Components\Textarea::make('carmi')
-                    ->label('Digital Key')
+                    ->label('卡密内容')
                     ->required()
                     ->rows(5)
                     ->columnSpanFull(),
@@ -94,46 +94,46 @@ class CarmisResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('goods.gd_name')
-                    ->label('Product')
+                    ->label('商品')
                     ->searchable()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('status')
-                    ->label('Status')
+                    ->label('状态')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => $state == Carmis::STATUS_UNSOLD ? 'Unsold' : 'Sold')
+                    ->formatStateUsing(fn ($state) => $state == Carmis::STATUS_UNSOLD ? '未售出' : '已售出')
                     ->color(fn ($state) => $state == Carmis::STATUS_UNSOLD ? 'success' : 'danger'),
 
                 Tables\Columns\IconColumn::make('is_loop')
-                    ->label('Reusable')
+                    ->label('可重复')
                     ->boolean(),
 
                 Tables\Columns\TextColumn::make('carmi')
-                    ->label('Key')
+                    ->label('卡密')
                     ->limit(30)
                     ->copyable(),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Created At')
+                    ->label('创建时间')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Updated At')
+                    ->label('更新时间')
                     ->dateTime()
                     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('status')
-                    ->label('Status')
+                    ->label('状态')
                     ->options([
-                        Carmis::STATUS_UNSOLD => 'Unsold',
-                        Carmis::STATUS_SOLD => 'Sold',
+                        Carmis::STATUS_UNSOLD => '未售出',
+                        Carmis::STATUS_SOLD => '已售出',
                     ]),
                 Tables\Filters\SelectFilter::make('goods_id')
-                    ->label('Product')
+                    ->label('商品')
                     ->options(
                         Goods::query()
                             ->where('type', Goods::AUTOMATIC_DELIVERY)

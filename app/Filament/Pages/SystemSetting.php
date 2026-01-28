@@ -31,6 +31,11 @@ class SystemSetting extends Page implements HasForms
         return '系统设置';
     }
 
+    public function getTitle(): string
+    {
+        return '系统设置';
+    }
+
     public static function getNavigationGroup(): ?string
     {
         return '系统配置';
@@ -51,132 +56,132 @@ class SystemSetting extends Page implements HasForms
     {
         return $schema
             ->components([
-                Tabs::make('Settings')
+                Tabs::make('设置')
                     ->tabs([
-                        Tab::make('Base Settings')
+                        Tab::make('基本设置')
                             ->schema([
                                 Section::make('站点信息')
                                     ->schema([
                                         Forms\Components\TextInput::make('title')
-                                            ->label('Site Title')
+                                            ->label('站点标题')
                                             ->required(),
                                         Forms\Components\FileUpload::make('img_logo')
-                                            ->label('Logo Image')
+                                            ->label('Logo 图片')
                                             ->image()
                                             ->disk('admin'),
                                         Forms\Components\TextInput::make('text_logo')
-                                            ->label('Text Logo'),
+                                            ->label('文字Logo'),
                                         Forms\Components\TextInput::make('keywords')
-                                            ->label('SEO Keywords'),
+                                            ->label('SEO 关键词'),
                                         Forms\Components\Textarea::make('description')
-                                            ->label('Description')
+                                            ->label('描述')
                                             ->columnSpanFull(),
                                     ])->columns(2),
 
                                 Section::make('显示与安全')
                                     ->schema([
                                         Forms\Components\Select::make('template')
-                                            ->label('Template')
+                                            ->label('模板')
                                             ->options(config('dujiaoka.templates', []))
                                             ->required(),
                                         Forms\Components\Select::make('language')
-                                            ->label('Language')
+                                            ->label('语言')
                                             ->options(config('dujiaoka.language', []))
                                             ->required(),
                                         Forms\Components\TextInput::make('manage_email')
-                                            ->label('Admin Email'),
+                                            ->label('管理员邮箱'),
                                         Forms\Components\TextInput::make('order_expire_time')
-                                            ->label('Order Expire Time (minutes)')
+                                            ->label('订单过期时间（分钟）')
                                             ->numeric()
                                             ->default(5)
                                             ->required(),
                                         Forms\Components\Toggle::make('is_open_anti_red')
-                                            ->label('Anti-Red Mode'),
+                                            ->label('防红模式'),
                                         Forms\Components\Toggle::make('is_open_img_code')
-                                            ->label('Image Captcha'),
+                                            ->label('图片验证码'),
                                         Forms\Components\Toggle::make('is_open_search_pwd')
-                                            ->label('Search Password'),
+                                            ->label('查询密码'),
                                         Forms\Components\Toggle::make('is_open_google_translate')
-                                            ->label('Google Translate'),
+                                            ->label('谷歌翻译'),
                                     ])->columns(2),
 
                                 Section::make('公告与页脚')
                                     ->schema([
                                         Forms\Components\RichEditor::make('notice')
-                                            ->label('Notice')
+                                            ->label('公告')
                                             ->columnSpanFull(),
                                         Forms\Components\Textarea::make('footer')
-                                            ->label('Footer')
+                                            ->label('页脚')
                                             ->columnSpanFull(),
                                     ]),
                             ]),
 
-                        Tab::make('Order Push Settings')
+                        Tab::make('订单推送设置')
                             ->schema([
                                 Section::make('Server酱')
                                     ->schema([
                                         Forms\Components\Toggle::make('is_open_server_jiang')
-                                            ->label('Server Jiang'),
+                                            ->label('Server酱'),
                                         Forms\Components\TextInput::make('server_jiang_token')
-                                            ->label('Server Jiang Token'),
+                                            ->label('Server酱 Token'),
                                     ])->columns(2),
 
                                 Section::make('Telegram')
                                     ->schema([
                                         Forms\Components\Toggle::make('is_open_telegram_push')
-                                            ->label('Telegram Push'),
+                                            ->label('Telegram 推送'),
                                         Forms\Components\TextInput::make('telegram_bot_token')
-                                            ->label('Telegram Bot Token'),
+                                            ->label('Telegram 机器人Token'),
                                         Forms\Components\TextInput::make('telegram_userid')
-                                            ->label('Telegram User ID'),
+                                            ->label('Telegram 用户ID'),
                                     ])->columns(2),
 
                                 Section::make('Bark')
                                     ->schema([
                                         Forms\Components\Toggle::make('is_open_bark_push')
-                                            ->label('Bark Push'),
+                                            ->label('Bark 推送'),
                                         Forms\Components\Toggle::make('is_open_bark_push_url')
-                                            ->label('Bark Custom URL'),
+                                            ->label('Bark 自定义URL'),
                                         Forms\Components\TextInput::make('bark_server')
-                                            ->label('Bark Server'),
+                                            ->label('Bark 服务器'),
                                         Forms\Components\TextInput::make('bark_token')
-                                            ->label('Bark Token'),
+                                            ->label('Bark 令牌'),
                                     ])->columns(2),
 
                                 Section::make('企业微信')
                                     ->schema([
                                         Forms\Components\Toggle::make('is_open_qywxbot_push')
-                                            ->label('WeCom Bot Push'),
+                                            ->label('企业微信机器人推送'),
                                         Forms\Components\TextInput::make('qywxbot_key')
-                                            ->label('WeCom Bot Key'),
+                                            ->label('企业微信机器人密钥'),
                                     ])->columns(2),
                             ]),
 
-                        Tab::make('Mail Settings')
+                        Tab::make('邮件设置')
                             ->schema([
                                 Section::make('SMTP配置')
                                     ->schema([
                                         Forms\Components\TextInput::make('driver')
-                                            ->label('Mail Driver')
+                                            ->label('邮件驱动')
                                             ->default('smtp')
                                             ->required(),
                                         Forms\Components\TextInput::make('host')
-                                            ->label('SMTP Host'),
+                                            ->label('SMTP 主机'),
                                         Forms\Components\TextInput::make('port')
-                                            ->label('SMTP Port')
+                                            ->label('SMTP 端口')
                                             ->default('587'),
                                         Forms\Components\TextInput::make('username')
-                                            ->label('Username'),
+                                            ->label('用户名'),
                                         Forms\Components\TextInput::make('password')
-                                            ->label('Password')
+                                            ->label('密码')
                                             ->password(),
                                         Forms\Components\TextInput::make('encryption')
-                                            ->label('Encryption')
+                                            ->label('加密方式')
                                             ->placeholder('tls'),
                                         Forms\Components\TextInput::make('from_address')
-                                            ->label('From Address'),
+                                            ->label('发件人地址'),
                                         Forms\Components\TextInput::make('from_name')
-                                            ->label('From Name'),
+                                            ->label('发件人名称'),
                                     ])->columns(2),
                             ]),
 
@@ -187,9 +192,9 @@ class SystemSetting extends Page implements HasForms
                                         Forms\Components\TextInput::make('geetest_id')
                                             ->label('GeeTest ID'),
                                         Forms\Components\TextInput::make('geetest_key')
-                                            ->label('GeeTest Key'),
+                                            ->label('GeeTest 密钥'),
                                         Forms\Components\Toggle::make('is_open_geetest')
-                                            ->label('Enable GeeTest'),
+                                            ->label('启用 GeeTest'),
                                     ])->columns(2),
                             ]),
                     ])->columnSpanFull(),
@@ -203,7 +208,7 @@ class SystemSetting extends Page implements HasForms
         Cache::put('system-setting', $data);
 
         Notification::make()
-            ->title('Settings saved successfully')
+            ->title('设置保存成功')
             ->success()
             ->send();
     }
