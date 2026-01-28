@@ -13,6 +13,8 @@ class Goods extends BaseModel
 
     protected $table = 'goods';
 
+    protected $fillable = ['group_id', 'gd_name', 'gd_description', 'gd_keywords', 'picture', 'retail_price', 'actual_price', 'in_stock', 'sales_volume', 'ord', 'buy_limit_num', 'buy_prompt', 'description', 'type', 'wholesale_price_cnf', 'other_ipu_cnf', 'api_hook', 'is_open'];
+
     protected $dispatchesEvents = [
         'deleted' => GoodsDeleted::class
     ];

@@ -13,6 +13,8 @@ class GoodsGroup extends BaseModel
 
     protected $table = 'goods_group';
 
+    protected $fillable = ['gp_name', 'is_open', 'ord'];
+
     protected $dispatchesEvents = [
         'deleted' => GoodsGroupDeleted::class
     ];

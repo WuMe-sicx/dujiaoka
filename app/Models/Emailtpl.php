@@ -12,4 +12,6 @@ class Emailtpl extends Model
 
     protected $table = 'emailtpls';
 
+    protected $fillable = ['tpl_name', 'tpl_content', 'tpl_token'];
+
 }
