@@ -5,9 +5,22 @@ namespace App\Admin\Forms;
 use App\Models\BaseModel;
 use Dcat\Admin\Widgets\Form;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 
 class SystemSetting extends Form
 {
+    /**
+     * 需要加密存储的敏感字段
+     */
+    const SENSITIVE_KEYS = [
+        'password',          // SMTP密码
+        'server_jiang_token',
+        'telegram_bot_token',
+        'bark_token',
+        'qywxbot_key',
+        'geetest_key',
+    ];
+
     /**
      * Handle the form request.
      *
@@ -17,6 +30,12 @@ class SystemSetting extends Form
      */
     public function handle(array $input)
     {
+        // 加密敏感字段
+        foreach (self::SENSITIVE_KEYS as $key) {
+            if (isset($input[$key]) && $input[$key] !== '') {
+                $input[$key] = Crypt::encryptString($input[$key]);
+            }
+        }
         Cache::put('system-setting', $input);
         return $this
 				->response()
@@ -96,7 +115,21 @@ class SystemSetting extends Form
 
     public function default()
     {
-        return Cache::get('system-setting');
+        $settings = Cache::get('system-setting');
+        if (!is_array($settings)) {
+            return $settings;
+        }
+        // 解密敏感字段供表单显示
+        foreach (self::SENSITIVE_KEYS as $key) {
+            if (isset($settings[$key]) && $settings[$key] !== '') {
+                try {
+                    $settings[$key] = Crypt::decryptString($settings[$key]);
+                } catch (\Exception $e) {
+                    // 兼容未加密的旧数据
+                }
+            }
+        }
+        return $settings;
     }
 
 }

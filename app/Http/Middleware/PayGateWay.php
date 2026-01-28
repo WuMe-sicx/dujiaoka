@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Facades\Log;
 
 class PayGateWay
 {
@@ -16,6 +17,14 @@ class PayGateWay
      */
     public function handle($request, Closure $next)
     {
+        // 记录支付回调请求日志，用于安全审计和问题排查
+        if ($request->isMethod('post')) {
+            Log::channel('daily')->info('payment_callback', [
+                'ip' => $request->ip(),
+                'path' => $request->path(),
+                'method' => $request->method(),
+            ]);
+        }
         return $next($request);
     }
 }

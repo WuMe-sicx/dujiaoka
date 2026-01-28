@@ -19,7 +19,7 @@ class VerifyCsrfToken extends Middleware
      * @var array
      */
     protected $except = [
-        'pay/*',
+        'pay/*/notify_url',
         'install',
         'do-install',
     ];

@@ -21,17 +21,17 @@ Route::group(['middleware' => ['dujiaoka.boot'],'namespace' => 'Home'], function
     // 结算页
     Route::get('bill/{orderSN}', 'OrderController@bill');
     // 通过订单号详情页
-    Route::get('detail-order-sn/{orderSN}', 'OrderController@detailOrderSN');
+    Route::get('detail-order-sn/{orderSN}', 'OrderController@detailOrderSN')->middleware('throttle:20,1');
     // 订单查询页
     Route::get('order-search', 'OrderController@orderSearch');
     // 检查订单状态
     Route::get('check-order-status/{orderSN}', 'OrderController@checkOrderStatus');
     // 通过订单号查询
-    Route::post('search-order-by-sn', 'OrderController@searchOrderBySN');
+    Route::post('search-order-by-sn', 'OrderController@searchOrderBySN')->middleware('throttle:10,1');
     // 通过邮箱查询
-    Route::post('search-order-by-email', 'OrderController@searchOrderByEmail');
+    Route::post('search-order-by-email', 'OrderController@searchOrderByEmail')->middleware('throttle:10,1');
     // 通过浏览器查询
-    Route::post('search-order-by-browser', 'OrderController@searchOrderByBrowser');
+    Route::post('search-order-by-browser', 'OrderController@searchOrderByBrowser')->middleware('throttle:10,1');
 });
 
 Route::group(['middleware' => ['install.check'],'namespace' => 'Home'], function () {

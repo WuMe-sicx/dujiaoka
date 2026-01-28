@@ -58,7 +58,17 @@ if (! function_exists('dujiaoka_config_get')) {
     function dujiaoka_config_get(string $key, $default = null)
     {
        $sysConfig = Cache::get('system-setting');
-       return $sysConfig[$key] ?? $default;
+       $value = $sysConfig[$key] ?? $default;
+       // 自动解密敏感字段
+       $sensitiveKeys = ['password', 'server_jiang_token', 'telegram_bot_token', 'bark_token', 'qywxbot_key', 'geetest_key'];
+       if ($value && in_array($key, $sensitiveKeys)) {
+           try {
+               $value = \Illuminate\Support\Facades\Crypt::decryptString($value);
+           } catch (\Exception $e) {
+               // 兼容未加密的旧数据
+           }
+       }
+       return $value;
     }
 }
 

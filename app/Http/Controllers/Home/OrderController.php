@@ -103,7 +103,14 @@ class OrderController extends BaseController
             Cookie::queue('dujiaoka_orders', json_encode([$orderSN]));
         } else {
             $cookies = json_decode($cookies, true);
+            if (!is_array($cookies)) {
+                $cookies = [];
+            }
             array_push($cookies, $orderSN);
+            // 限制最多保留50条订单记录，防止cookie无限增长
+            if (count($cookies) > 50) {
+                $cookies = array_slice($cookies, -50);
+            }
             Cookie::queue('dujiaoka_orders', json_encode($cookies));
         }
     }
@@ -156,6 +163,7 @@ class OrderController extends BaseController
         if ($order->status > Order::STATUS_WAIT_PAY) {
             return response()->json(['msg' => 'success', 'code' => 200]);
         }
+        return response()->json(['msg' => 'unknown', 'code' => 400002]);
     }
 
     /**

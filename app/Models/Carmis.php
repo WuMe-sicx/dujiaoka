@@ -11,6 +11,13 @@ class Carmis extends BaseModel
 
     protected $table = 'carmis';
 
+    protected $fillable = ['goods_id', 'is_loop', 'carmi'];
+
+    /**
+     * 不可批量赋值的字段（status 仅允许通过业务逻辑修改）
+     */
+    protected $guarded = ['status'];
+
     /**
      * 未售出
      */

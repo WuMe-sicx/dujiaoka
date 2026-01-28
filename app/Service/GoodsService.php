@@ -134,6 +134,17 @@ class GoodsService
     }
 
     /**
+     * 库存增加（回退）
+     *
+     * @param int $id 商品id
+     * @param int $number 入库数量
+     */
+    public function inStockIncr(int $id, int $number = 1): bool
+    {
+        return Goods::query()->where('id', $id)->increment('in_stock', $number);
+    }
+
+    /**
      * 商品销量加
      *
      * @param int $id 商品id

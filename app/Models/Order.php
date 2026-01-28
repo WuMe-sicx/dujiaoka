@@ -13,6 +13,13 @@ class Order extends BaseModel
 
     protected $table = 'orders';
 
+    protected $fillable = ['order_sn', 'goods_id', 'coupon_id', 'title', 'type', 'goods_price', 'buy_amount', 'coupon_discount_price', 'wholesale_discount_price', 'total_price', 'actual_price', 'search_pwd', 'email', 'info', 'pay_id', 'buy_ip', 'trade_no', 'coupon_ret_back'];
+
+    /**
+     * 不可批量赋值的字段（status 仅允许通过业务逻辑修改）
+     */
+    protected $guarded = ['status'];
+
     /**
      * 待支付
      */

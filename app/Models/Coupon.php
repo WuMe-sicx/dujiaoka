@@ -11,6 +11,13 @@ class Coupon extends BaseModel
 
     protected $table = 'coupons';
 
+    protected $fillable = ['discount', 'is_open', 'coupon', 'ret'];
+
+    /**
+     * 不可批量赋值的字段（is_use 仅允许通过业务逻辑修改）
+     */
+    protected $guarded = ['is_use'];
+
     /**
      * 一次性使用
      */

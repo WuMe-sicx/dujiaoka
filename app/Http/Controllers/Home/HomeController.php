@@ -177,11 +177,14 @@ class HomeController extends BaseController
             file_put_contents($installLock, 'install ok');
             return 'success';
         } catch (\RedisException $exception) {
-            return 'Redis配置错误 :' . $exception->getMessage();
+            \Log::error('安装Redis配置错误', ['error' => $exception->getMessage()]);
+            return 'Redis配置错误，请检查连接参数';
         } catch (QueryException $exception) {
-            return '数据库配置错误 :' . $exception->getMessage();
+            \Log::error('安装数据库配置错误', ['error' => $exception->getMessage()]);
+            return '数据库配置错误，请检查连接参数';
         } catch (\Exception $exception) {
-            return $exception->getMessage();
+            \Log::error('安装失败', ['error' => $exception->getMessage()]);
+            return '安装失败，请检查配置后重试';
         }
     }
 

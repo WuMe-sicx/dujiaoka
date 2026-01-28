@@ -102,8 +102,18 @@ class OrderService
      */
     public function validatorGoods(Request $request): Goods
     {
-        // 获得商品详情
-        $goods = $this->goodsService->detail($request->input('gid'));
+        // 获得商品详情（加行锁防止并发超卖）
+        $goods = Goods::query()
+            ->with(['coupon'])
+            ->withCount(['carmis' => function($query) {
+                $query->where('status', Carmis::STATUS_UNSOLD);
+            }])
+            ->where('id', $request->input('gid'))
+            ->lockForUpdate()
+            ->first();
+        if (!$goods) {
+            throw new RuleValidationException(__('dujiaoka.prompt.goods_does_not_exist'));
+        }
         // 商品状态验证
         $this->goodsService->validatorGoodsStatus($goods);
         // 如果有限购

@@ -352,12 +352,17 @@ class OrderProcessService
             );
             // 保存订单
             $order->save();
-            // 如果有用到优惠券
+            // 如果有用到优惠券（原子操作防止并发双重使用）
             if ($this->coupon) {
+                $decremented = \App\Models\Coupon::query()
+                    ->where('coupon', $this->coupon->coupon)
+                    ->where('ret', '>', 0)
+                    ->decrement('ret', 1);
+                if (!$decremented) {
+                    throw new RuleValidationException(__('dujiaoka.prompt.coupon_lack_of_available_opportunities'));
+                }
                 // 设置优惠码已经使用
                 $this->couponService->used($this->coupon->coupon);
-                // 使用次数-1
-                $this->couponService->retDecr($this->coupon->coupon);
             }
             // 将订单加入队列 x分钟后过期
             $expiredOrderDate = dujiaoka_config_get('order_expire_time', 5);
@@ -386,8 +391,11 @@ class OrderProcessService
     {
         DB::beginTransaction();
         try {
-            // 得到订单详情
-            $order = $this->orderService->detailOrderSN($orderSN);
+            // 得到订单详情（加行锁防止并发重复处理）
+            $order = Order::query()->with(['coupon', 'pay', 'goods'])
+                ->where('order_sn', $orderSN)
+                ->lockForUpdate()
+                ->first();
             if (!$order) {
                 throw new \Exception(__('dujiaoka.prompt.order_does_not_exist'));
             }
@@ -457,11 +465,10 @@ class OrderProcessService
         $this->goodsService->inStockDecr($order->goods_id, $order->buy_amount);
         // 邮件数据
         $mailData = [
-            'created_at' => $order->create_at,
             'product_name' => $order->goods->gd_name,
             'webname' => dujiaoka_config_get('text_logo', '独角数卡'),
             'weburl' => config('app.url') ?? 'http://dujiaoka.com',
-            'ord_info' => str_replace(PHP_EOL, '<br/>', $order->info),
+            'ord_info' => str_replace(PHP_EOL, '<br/>', e($order->info)),
             'ord_title' => $order->title,
             'order_id' => $order->order_sn,
             'buy_amount' => $order->buy_amount,
@@ -495,6 +502,8 @@ class OrderProcessService
             $order->info = __('dujiaoka.prompt.order_carmis_insufficient_quantity_available');
             $order->status = Order::STATUS_ABNORMAL;
             $order->save();
+            // 库存回退
+            $this->goodsService->inStockIncr($order->goods_id, $order->buy_amount);
             return $order;
         }
         $carmisInfo = array_column($carmis, 'carmi');
@@ -506,7 +515,7 @@ class OrderProcessService
         $this->carmisService->soldByIDS($ids);
         // 邮件数据
         $mailData = [
-            'created_at' => $order->create_at,
+            'created_at' => $order->created_at,
             'product_name' => $order->goods->gd_name,
             'webname' => dujiaoka_config_get('text_logo', '独角数卡'),
             'weburl' => config('app.url') ?? 'http://dujiaoka.com',
