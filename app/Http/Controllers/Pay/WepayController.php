@@ -69,17 +69,23 @@ class WepayController extends PayController
     public function notifyUrl()
     {
         $xml = file_get_contents('php://input');
-        $arr = json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
-        $oid = $arr['out_trade_no'];
+        // 防止 XXE 攻击
+        $arr = json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NONET | LIBXML_NOERROR)), true);
+        $oid = $arr['out_trade_no'] ?? '';
+        $this->logPaymentCallback('WeChat', '收到回调', ['order_sn' => $oid]);
+
         $order = $this->orderService->detailOrderSN($oid);
         if (!$order) {
+            $this->logPaymentError('WeChat', '订单不存在', ['order_sn' => $oid]);
             return 'error';
         }
         $payGateway = $this->payService->detail($order->pay_id);
         if (!$payGateway) {
+            $this->logPaymentError('WeChat', '支付网关不存在', ['order_sn' => $oid, 'pay_id' => $order->pay_id]);
             return 'error';
         }
         if($payGateway->pay_handleroute != '/pay/wepay'){
+            $this->logPaymentError('WeChat', '路由不匹配', ['order_sn' => $oid, 'route' => $payGateway->pay_handleroute]);
             return 'error';
         }
 
@@ -105,8 +111,10 @@ class WepayController extends PayController
 
             $total_fee = bcdiv($result->total_fee, 100, 2);
             $this->orderProcessService->completedOrder($result->out_trade_no, $total_fee, $result->transaction_id);
+            $this->logPaymentCallback('WeChat', '订单完成', ['order_sn' => $result->out_trade_no, 'trade_no' => $result->transaction_id]);
             return 'success';
         } catch (\Exception $exception) {
+            $this->logPaymentError('WeChat', '处理失败', ['order_sn' => $oid, 'error' => $exception->getMessage()]);
             return 'fail';
         }
     }

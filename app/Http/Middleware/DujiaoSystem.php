@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use App\Providers\AppServiceProvider;
 use Closure;
+use Illuminate\Support\Facades\URL;
 
 class DujiaoSystem
 {
@@ -16,16 +16,15 @@ class DujiaoSystem
      */
     public function handle($request, Closure $next)
     {
-        // 检测https
-        if ($request->getScheme() == 'https') {
-            $httpsConfig = [
-                'https' => true
-            ];
-            config([
-                'admin'  =>  array_merge(config('admin'), $httpsConfig)
-            ]);
-            (new AppServiceProvider(app()))->register();
+        // 检测 HTTPS：直接连接或经反向代理 (X-Forwarded-Proto)
+        if (
+            $request->getScheme() === 'https'
+            || $request->header('X-Forwarded-Proto') === 'https'
+            || config('app.admin_https', false)
+        ) {
+            URL::forceScheme('https');
         }
+
         return $next($request);
     }
 }

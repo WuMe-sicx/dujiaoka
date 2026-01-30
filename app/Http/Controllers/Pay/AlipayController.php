@@ -92,15 +92,20 @@ class AlipayController extends PayController
     public function notifyUrl(Request $request)
     {
         $orderSN = $request->input('out_trade_no');
+        $this->logPaymentCallback('Alipay', '收到回调', ['order_sn' => $orderSN]);
+
         $order = $this->orderService->detailOrderSN($orderSN);
         if (!$order) {
+            $this->logPaymentError('Alipay', '订单不存在', ['order_sn' => $orderSN]);
             return 'error';
         }
         $payGateway = $this->payService->detail($order->pay_id);
         if (!$payGateway) {
+            $this->logPaymentError('Alipay', '支付网关不存在', ['order_sn' => $orderSN, 'pay_id' => $order->pay_id]);
             return 'error';
         }
         if($payGateway->pay_handleroute != '/pay/alipay'){
+            $this->logPaymentError('Alipay', '路由不匹配', ['order_sn' => $orderSN, 'route' => $payGateway->pay_handleroute]);
             return 'fail';
         }
 
@@ -126,9 +131,11 @@ class AlipayController extends PayController
 
             if ($result->trade_status == 'TRADE_SUCCESS' || $result->trade_status == 'TRADE_FINISHED') {
                 $this->orderProcessService->completedOrder($result->out_trade_no, $result->total_amount, $result->trade_no);
+                $this->logPaymentCallback('Alipay', '订单完成', ['order_sn' => $result->out_trade_no, 'trade_no' => $result->trade_no]);
             }
             return 'success';
         } catch (\Exception $exception) {
+            $this->logPaymentError('Alipay', '处理失败', ['order_sn' => $orderSN, 'error' => $exception->getMessage()]);
             return 'fail';
         }
     }

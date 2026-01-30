@@ -21,8 +21,10 @@ use App\Models\BaseModel;
 use App\Models\Coupon;
 use App\Models\Goods;
 use App\Models\Order;
+use App\Models\Pay;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 /**
@@ -112,11 +114,12 @@ class OrderProcessService
      */
     private $buyIP;
 
+
     /**
-     * 支付方式
-     * @var int
+     * 支付服务层
+     * @var \App\Service\PayService
      */
-    private $payID;
+    private $payService;
 
     public function __construct()
     {
@@ -125,6 +128,7 @@ class OrderProcessService
         $this->carmisService = app('Service\CarmisService');
         $this->emailtplService = app('Service\EmailtplService');
         $this->goodsService = app('Service\GoodsService');
+        $this->payService = app('Service\PayService');
 
     }
 
@@ -301,6 +305,38 @@ class OrderProcessService
     }
 
     /**
+     * 计算通道手续费
+     */
+    private function calculateChannelFee(float $amount): float
+    {
+        $pay = Pay::find($this->payID);
+        if (!$pay) {
+            return 0;
+        }
+        $percentFee = bcmul($amount, bcdiv($pay->fee_rate ?? 0, 100, 4), 2);
+        return bcadd($percentFee, $pay->fee_fixed ?? 0, 2);
+    }
+
+    /**
+     * 检查未支付订单限制
+     */
+    private function checkPendingOrderLimit(): void
+    {
+        $maxPending = (int) dujiaoka_config_get('max_pending_orders', 0);
+        if ($maxPending === 0) {
+            return;
+        }
+
+        $pendingCount = Order::where('buy_ip', $this->buyIP)
+            ->where('status', Order::STATUS_WAIT_PAY)
+            ->count();
+
+        if ($pendingCount >= $maxPending) {
+            throw new RuleValidationException(__('dujiaoka.prompt.too_many_pending_orders'));
+        }
+    }
+
+    /**
      * 创建订单.
      * @return Order
      * @throws RuleValidationException
@@ -312,6 +348,9 @@ class OrderProcessService
     public function createOrder(): Order
     {
         try {
+            // 检查未支付订单限制
+            $this->checkPendingOrderLimit();
+
             $order = new Order();
             // 生成订单号
             $order->order_sn = strtoupper(Str::random(16));
@@ -350,6 +389,8 @@ class OrderProcessService
                 $this->calculateTheCouponPrice(),
                 $this->calculateTheWholesalePrice()
             );
+            // 通道手续费
+            $order->channel_fee = $this->calculateChannelFee($order->actual_price);
             // 保存订单
             $order->save();
             // 如果有用到优惠券（原子操作防止并发双重使用）
@@ -406,6 +447,12 @@ class OrderProcessService
             $bccomp = bccomp($order->actual_price, $actualPrice, 2);
             // 金额不一致
             if ($bccomp != 0) {
+                Log::warning('支付回调金额不一致', [
+                    'order_sn' => $orderSN,
+                    'expected' => $order->actual_price,
+                    'received' => $actualPrice,
+                    'trade_no' => $tradeNo,
+                ]);
                 throw new \Exception(__('dujiaoka.prompt.order_inconsistent_amounts'));
             }
             $order->actual_price = $actualPrice;

@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('pay-gateway/{handle}/{payway}/{orderSN}', 'PayController@redirectGateway');
 
 // 支付相关
-Route::group(['prefix' => 'pay', 'namespace' => 'Pay', 'middleware' => ['dujiaoka.pay_gate_way']], function () {
+Route::group(['prefix' => 'pay', 'namespace' => 'Pay', 'middleware' => ['dujiaoka.pay_gate_way', 'throttle:60,1']], function () {
     // 支付宝
     Route::get('alipay/{payway}/{orderSN}', 'AlipayController@gateway');
     Route::post('alipay/notify_url', 'AlipayController@notifyUrl');

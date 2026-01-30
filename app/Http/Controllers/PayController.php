@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exceptions\RuleValidationException;
 use App\Models\Order;
 use App\Service\OrderProcessService;
+use Illuminate\Support\Facades\Log;
 
 class PayController extends BaseController
 {
@@ -127,4 +128,19 @@ class PayController extends BaseController
 
     }
 
+    /**
+     * 记录支付回调日志
+     */
+    protected function logPaymentCallback(string $gateway, string $event, array $context = []): void
+    {
+        Log::info("[支付回调] {$gateway}: {$event}", $context);
+    }
+
+    /**
+     * 记录支付回调错误
+     */
+    protected function logPaymentError(string $gateway, string $event, array $context = []): void
+    {
+        Log::warning("[支付回调] {$gateway}: {$event}", $context);
+    }
 }
