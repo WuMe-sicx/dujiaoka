@@ -102,6 +102,20 @@ class PayResource extends Resource
                     ->maxLength(255)
                     ->placeholder('/pay/alipay'),
 
+                Forms\Components\TextInput::make('fee_rate')
+                    ->label('费率 (%)')
+                    ->numeric()
+                    ->default(0)
+                    ->suffix('%')
+                    ->helperText('按交易金额百分比收取'),
+
+                Forms\Components\TextInput::make('fee_fixed')
+                    ->label('固定手续费')
+                    ->numeric()
+                    ->prefix('¥')
+                    ->default(0)
+                    ->helperText('每笔交易固定金额'),
+
                 Forms\Components\Toggle::make('is_open')
                     ->label('状态')
                     ->default(true),

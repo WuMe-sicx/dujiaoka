@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Order;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Carbon;
@@ -10,48 +11,104 @@ use Illuminate\Support\Facades\DB;
 
 class StatsOverview extends BaseWidget
 {
+    use InteractsWithPageFilters;
+
     protected static ?int $sort = 0;
+
+    public ?string $filter = 'today';
+
+    protected function getFilters(): ?array
+    {
+        return [
+            'today' => '今日',
+            'week' => '本周',
+            'month' => '本月',
+            'year' => '本年',
+        ];
+    }
+
+    protected function getDateRange(): array
+    {
+        return match ($this->filter) {
+            'week' => [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()],
+            'month' => [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()],
+            'year' => [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()],
+            default => [Carbon::today(), Carbon::tomorrow()],
+        };
+    }
+
+    protected function getPreviousDateRange(): array
+    {
+        return match ($this->filter) {
+            'week' => [Carbon::now()->subWeek()->startOfWeek(), Carbon::now()->subWeek()->endOfWeek()],
+            'month' => [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()],
+            'year' => [Carbon::now()->subYear()->startOfYear(), Carbon::now()->subYear()->endOfYear()],
+            default => [Carbon::yesterday(), Carbon::today()],
+        };
+    }
+
+    protected function getPeriodLabel(): string
+    {
+        return match ($this->filter) {
+            'week' => '本周',
+            'month' => '本月',
+            'year' => '本年',
+            default => '今日',
+        };
+    }
+
+    protected function getCompareLabel(): string
+    {
+        return match ($this->filter) {
+            'week' => '较上周',
+            'month' => '较上月',
+            'year' => '较去年',
+            default => '较昨日',
+        };
+    }
 
     protected function getStats(): array
     {
-        $today = Carbon::today();
-        $yesterday = Carbon::yesterday();
+        [$start, $end] = $this->getDateRange();
+        [$prevStart, $prevEnd] = $this->getPreviousDateRange();
+        $periodLabel = $this->getPeriodLabel();
+        $compareLabel = $this->getCompareLabel();
 
-        // Today's metrics
-        $todayOrders = Order::whereDate('created_at', $today)->count();
-        $yesterdayOrders = Order::whereDate('created_at', $yesterday)->count();
+        // Current period metrics
+        $currentOrders = Order::whereBetween('created_at', [$start, $end])->count();
+        $previousOrders = Order::whereBetween('created_at', [$prevStart, $prevEnd])->count();
 
-        $todayRevenue = Order::whereDate('created_at', $today)
+        $currentRevenue = Order::whereBetween('created_at', [$start, $end])
             ->where('status', Order::STATUS_COMPLETED)
             ->sum('actual_price');
-        $yesterdayRevenue = Order::whereDate('created_at', $yesterday)
+        $previousRevenue = Order::whereBetween('created_at', [$prevStart, $prevEnd])
             ->where('status', Order::STATUS_COMPLETED)
             ->sum('actual_price');
 
         $pendingOrders = Order::where('status', Order::STATUS_PENDING)->count();
 
         // Payment conversion rate
-        $todayTotal = $todayOrders ?: 1;
-        $todayPaid = Order::whereDate('created_at', $today)
+        $currentTotal = $currentOrders ?: 1;
+        $currentPaid = Order::whereBetween('created_at', [$start, $end])
             ->where('status', '>', Order::STATUS_WAIT_PAY)
             ->count();
-        $conversionRate = round(($todayPaid / $todayTotal) * 100, 1);
+        $conversionRate = round(($currentPaid / $currentTotal) * 100, 1);
 
-        $yesterdayTotal = $yesterdayOrders ?: 1;
-        $yesterdayPaid = Order::whereDate('created_at', $yesterday)
+        $previousTotal = $previousOrders ?: 1;
+        $previousPaid = Order::whereBetween('created_at', [$prevStart, $prevEnd])
             ->where('status', '>', Order::STATUS_WAIT_PAY)
             ->count();
-        $yesterdayConversion = round(($yesterdayPaid / $yesterdayTotal) * 100, 1);
-        $conversionTrend = round($conversionRate - $yesterdayConversion, 1);
+        $previousConversion = round(($previousPaid / $previousTotal) * 100, 1);
+        $conversionTrend = round($conversionRate - $previousConversion, 1);
 
         // Calculate trends
-        $orderTrend = $yesterdayOrders > 0
-            ? round((($todayOrders - $yesterdayOrders) / $yesterdayOrders) * 100, 1)
-            : ($todayOrders > 0 ? 100 : 0);
+        $orderTrend = $previousOrders > 0
+            ? round((($currentOrders - $previousOrders) / $previousOrders) * 100, 1)
+            : ($currentOrders > 0 ? 100 : 0);
 
-        $revenueTrend = $yesterdayRevenue > 0
-            ? round((($todayRevenue - $yesterdayRevenue) / $yesterdayRevenue) * 100, 1)
-            : ($todayRevenue > 0 ? 100 : 0);
+        $revenueTrend = $previousRevenue > 0
+            ? round((($currentRevenue - $previousRevenue) / $previousRevenue) * 100, 1)
+            : ($currentRevenue > 0 ? 100 : 0);
 
         // Sparkline data: last 7 days order counts
         $orderSparkline = Order::query()
@@ -106,14 +163,14 @@ class StatsOverview extends BaseWidget
         }
 
         return [
-            Stat::make('今日订单', $todayOrders)
-                ->description($orderTrend >= 0 ? "较昨日 +{$orderTrend}%" : "较昨日 {$orderTrend}%")
+            Stat::make("{$periodLabel}订单", $currentOrders)
+                ->description($orderTrend >= 0 ? "{$compareLabel} +{$orderTrend}%" : "{$compareLabel} {$orderTrend}%")
                 ->descriptionIcon($orderTrend >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color('info')
                 ->chart($orderSparkline ?: [0, 0, 0, 0, 0, 0, 0]),
 
-            Stat::make('今日收入', '¥' . number_format($todayRevenue, 2))
-                ->description($revenueTrend >= 0 ? "较昨日 +{$revenueTrend}%" : "较昨日 {$revenueTrend}%")
+            Stat::make("{$periodLabel}收入", '¥' . number_format($currentRevenue, 2))
+                ->description($revenueTrend >= 0 ? "{$compareLabel} +{$revenueTrend}%" : "{$compareLabel} {$revenueTrend}%")
                 ->descriptionIcon($revenueTrend >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color('success')
                 ->chart($revenueSparkline ?: [0, 0, 0, 0, 0, 0, 0]),
@@ -125,7 +182,7 @@ class StatsOverview extends BaseWidget
                 ->chart($pendingSparkline ?: [0, 0, 0, 0, 0, 0, 0]),
 
             Stat::make('支付转化率', $conversionRate . '%')
-                ->description($conversionTrend >= 0 ? "较昨日 +{$conversionTrend}%" : "较昨日 {$conversionTrend}%")
+                ->description($conversionTrend >= 0 ? "{$compareLabel} +{$conversionTrend}%" : "{$compareLabel} {$conversionTrend}%")
                 ->descriptionIcon($conversionTrend >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($conversionRate >= 70 ? 'success' : ($conversionRate >= 50 ? 'warning' : 'danger'))
                 ->chart($conversionSparkline ?: [0, 0, 0, 0, 0, 0, 0]),

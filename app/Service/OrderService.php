@@ -37,10 +37,17 @@ class OrderService
      */
     private $couponService;
 
+    /**
+     * 限购服务层
+     * @var \App\Service\PurchaseLimitService
+     */
+    private $purchaseLimitService;
+
     public function __construct()
     {
         $this->goodsService = app('Service\GoodsService');
         $this->couponService = app('Service\CouponService');
+        $this->purchaseLimitService = app('Service\PurchaseLimitService');
     }
 
 
@@ -120,6 +127,13 @@ class OrderService
         if ($goods->buy_limit_num > 0 && $request->input('by_amount') > $goods->buy_limit_num) {
             throw new RuleValidationException(__('dujiaoka.prompt.purchase_limit_exceeded'));
         }
+        // 高级限购检查（按IP/Session/用户）
+        $this->purchaseLimitService->checkPurchaseLimit(
+            $goods,
+            $request,
+            auth()->id(),
+            (int) $request->input('by_amount', 1)
+        );
         // 库存不足
         if ($request->input('by_amount') > $goods->in_stock) {
             throw new RuleValidationException(__('dujiaoka.prompt.inventory_shortage'));

@@ -2,17 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class Pay extends BaseModel
 {
 
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'pays';
 
-    protected $fillable = ['pay_name', 'pay_check', 'pay_method', 'pay_client', 'merchant_id', 'merchant_key', 'merchant_pem', 'pay_handleroute', 'is_open'];
+    protected $fillable = ['pay_name', 'pay_check', 'pay_method', 'pay_client', 'merchant_id', 'merchant_key', 'merchant_pem', 'pay_handleroute', 'is_open', 'fee_rate', 'fee_fixed'];
 
     /**
      * 跳转

@@ -21,7 +21,7 @@
 
 - ✅ **Laravel 6 → 12 完整升级路径** (渐进式升级,每步可回滚)
 - ✅ **PHP 8.2 完全支持** (JIT 编译、性能提升 20%+)
-- ✅ **Dcat Admin 现代化** (printnow/laravel-admin 持续维护版本)
+- ✅ **Filament v5 后台管理** (替换 Dcat Admin，现代化 UI)
 - ✅ **支付包全面升级**:
   - 支付宝/微信: yansongda/pay v2 → v3 (更安全的 API)
   - PayPal: REST API SDK → Server SDK 2.2.0 (官方推荐)

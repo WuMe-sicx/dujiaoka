@@ -54,17 +54,46 @@ class HomeController extends BaseController
      * 商品详情
      *
      * @param int $id
+     * @param Request $request
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
      *
      * @author    assimon<ashang@utf8.hk>
      * @copyright assimon<ashang@utf8.hk>
      * @link      http://utf8.hk/
      */
-    public function buy(int $id)
+    public function buy(int $id, Request $request)
     {
         try {
             $goods = $this->goodsService->detail($id);
             $this->goodsService->validatorGoodsStatus($goods);
+
+            // 如果商品设置了访问密码
+            if (!empty($goods->access_password)) {
+                $sessionKey = 'goods_access_' . $id;
+                // 检查是否已验证过密码
+                if (!session($sessionKey)) {
+                    // 如果提交了密码验证
+                    if ($request->isMethod('post') && $request->filled('access_password')) {
+                        if ($request->input('access_password') === $goods->access_password) {
+                            session([$sessionKey => true]);
+                        } else {
+                            return $this->render('static_pages/goods_password', [
+                                'goods_id' => $id,
+                                'goods_name' => $goods->gd_name,
+                                'error' => __('dujiaoka.prompt.access_password_incorrect'),
+                            ], __('dujiaoka.page-title.verify_password'));
+                        }
+                    } else {
+                        // 显示密码验证页面
+                        return $this->render('static_pages/goods_password', [
+                            'goods_id' => $id,
+                            'goods_name' => $goods->gd_name,
+                            'error' => null,
+                        ], __('dujiaoka.page-title.verify_password'));
+                    }
+                }
+            }
+
             // 有没有优惠码可以展示
             if (count($goods->coupon)) {
                 $goods->open_coupon = 1;

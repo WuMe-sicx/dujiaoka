@@ -91,6 +91,14 @@ return [
     'money_symbol' => '￥',
     'purchase_limit' => '每单限',
 
+    // 商品访问密码
+    'access_password_required' => '需要访问密码',
+    'access_password_hint' => '商品「:name」需要输入访问密码才能查看和购买。',
+    'access_password' => '访问密码',
+    'enter_access_password' => '请输入访问密码',
+    'verify_password' => '验证密码',
+    'back_to_home' => '返回首页',
+
 
     'prompt' => [
         'server_illegal_request' => '非法请求！',
@@ -124,7 +132,12 @@ return [
         'no_related_order_found_for_cache' => '未找到相关订单缓存！',
         'no_related_order_found' => '未找到相关订单！',
         'new_order_push' => '新订单通知',
-        'loop_carmis_limit' => '此商品最多购买一件！'
+        'loop_carmis_limit' => '此商品最多购买一件！',
+        'access_password_incorrect' => '访问密码错误，请重新输入',
+        'too_many_pending_orders' => '您有过多未支付订单，请先完成或等待订单过期后再试',
+        'user_purchase_limit_exceeded' => '已超过用户购买限制（限购:limit件，已购:bought件）',
+        'ip_purchase_limit_exceeded' => '已超过今日IP购买限制（限购:limit件）',
+        'session_purchase_limit_exceeded' => '已超过会话购买限制（限购:limit件）',
     ],
 
     'equipment' => [
@@ -144,6 +157,7 @@ return [
         'home' => '首页',
         'bill' => '订单确认',
         'order-detail' => '订单详情',
-        'order-search' => '订单查询'
+        'order-search' => '订单查询',
+        'verify_password' => '验证访问密码',
     ]
 ];

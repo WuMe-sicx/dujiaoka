@@ -15,3 +15,5 @@ yarn-error.log
 install.lock
 .env.buck
 .flyenv
+升级.md
+CLAUDE.md

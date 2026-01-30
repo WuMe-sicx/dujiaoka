@@ -22,6 +22,19 @@ class GoodsResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'gd_name';
 
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['gd_name', 'gd_description', 'gd_keywords'];
+    }
+
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            '分类' => $record->group?->gp_name,
+            '价格' => '¥' . number_format($record->actual_price, 2),
+        ];
+    }
+
     public static function getNavigationIcon(): string
     {
         return 'heroicon-o-shopping-bag';
@@ -150,6 +163,24 @@ class GoodsResource extends Resource
 
                 Section::make('高级配置')
                     ->schema([
+                        Forms\Components\TextInput::make('access_password')
+                            ->label('访问密码')
+                            ->maxLength(100)
+                            ->helperText('设置后，前端需输入密码才可查看/购买该商品，留空则不限制'),
+
+                        Forms\Components\TextInput::make('stock_alert_threshold')
+                            ->label('库存预警阈值')
+                            ->numeric()
+                            ->default(10)
+                            ->helperText('库存低于此值时触发预警通知'),
+
+                        Forms\Components\KeyValue::make('purchase_limits')
+                            ->label('限购配置')
+                            ->keyLabel('限制类型')
+                            ->valueLabel('数量')
+                            ->helperText('支持 per_ip（单IP限制）、per_session（单会话限制）')
+                            ->columnSpanFull(),
+
                         Forms\Components\Textarea::make('wholesale_price_cnf')
                             ->label('批发价格')
                             ->rows(4)
@@ -168,7 +199,7 @@ class GoodsResource extends Resource
                         Forms\Components\Toggle::make('is_open')
                             ->label('启用')
                             ->default(true),
-                    ])->columns(1)
+                    ])->columns(2)
                     ->columnSpanFull(),
             ]);
     }
@@ -202,9 +233,9 @@ class GoodsResource extends Resource
                     ->formatStateUsing(fn ($state) => $state == Goods::AUTOMATIC_DELIVERY ? '自动' : '手动')
                     ->color(fn ($state) => $state == Goods::AUTOMATIC_DELIVERY ? 'success' : 'info'),
 
-                Tables\Columns\TextColumn::make('actual_price')
+                Tables\Columns\TextInputColumn::make('actual_price')
                     ->label('价格')
-                    ->money('CNY')
+                    ->rules(['required', 'numeric', 'min:0'])
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('in_stock')
@@ -217,6 +248,13 @@ class GoodsResource extends Resource
                                 ->count();
                         }
                         return $record->in_stock ?? 0;
+                    })
+                    ->color(function (Goods $record): ?string {
+                        $stock = $record->type == Goods::AUTOMATIC_DELIVERY
+                            ? Carmis::where('goods_id', $record->id)->where('status', Carmis::STATUS_UNSOLD)->count()
+                            : ($record->in_stock ?? 0);
+                        $threshold = $record->stock_alert_threshold ?? 10;
+                        return $stock <= $threshold ? 'danger' : null;
                     }),
 
                 Tables\Columns\TextColumn::make('sales_volume')
@@ -247,7 +285,8 @@ class GoodsResource extends Resource
                 Tables\Filters\SelectFilter::make('group_id')
                     ->label('分类')
                     ->options(GoodsGroup::query()->pluck('gp_name', 'id'))
-                    ->searchable(),
+                    ->searchable()
+                    ->preload(),
             ])
             ->actions([
                 Actions\EditAction::make(),

@@ -114,6 +114,20 @@ class SystemSetting extends Page implements HasForms
                                             ->label('页脚')
                                             ->columnSpanFull(),
                                     ]),
+
+                                Section::make('交易风控')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('max_pending_orders')
+                                            ->label('未支付订单限制')
+                                            ->numeric()
+                                            ->default(0)
+                                            ->helperText('同一IP最多允许的未支付订单数，0为不限制'),
+                                        Forms\Components\TextInput::make('default_stock_threshold')
+                                            ->label('默认库存预警阈值')
+                                            ->numeric()
+                                            ->default(10)
+                                            ->helperText('库存低于此值时触发预警通知'),
+                                    ])->columns(2),
                             ]),
 
                         Tab::make('订单推送设置')

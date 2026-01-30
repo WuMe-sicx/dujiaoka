@@ -4,16 +4,23 @@ namespace App\Models;
 
 
 use App\Events\GoodsDeleted;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Goods extends BaseModel
 {
 
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'goods';
 
-    protected $fillable = ['group_id', 'gd_name', 'gd_description', 'gd_keywords', 'picture', 'retail_price', 'actual_price', 'in_stock', 'sales_volume', 'ord', 'buy_limit_num', 'buy_prompt', 'description', 'type', 'wholesale_price_cnf', 'other_ipu_cnf', 'api_hook', 'is_open'];
+    protected $fillable = ['group_id', 'gd_name', 'gd_description', 'gd_keywords', 'picture', 'retail_price', 'actual_price', 'in_stock', 'stock_alert_threshold', 'sales_volume', 'ord', 'buy_limit_num', 'purchase_limits', 'buy_prompt', 'description', 'type', 'wholesale_price_cnf', 'other_ipu_cnf', 'api_hook', 'is_open', 'access_password'];
+
+    protected $casts = [
+        'purchase_limits' => 'array',
+    ];
+
+    protected $hidden = ['access_password'];
 
     protected $dispatchesEvents = [
         'deleted' => GoodsDeleted::class

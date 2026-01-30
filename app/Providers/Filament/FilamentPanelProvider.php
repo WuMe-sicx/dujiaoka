@@ -30,7 +30,7 @@ class FilamentPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login(Login::class)
-            ->authGuard('admin') // Use admin guard to share authentication with Dcat Admin
+            ->authGuard('admin') // Use admin guard for admin panel authentication
             ->darkMode(true)
             ->defaultThemeMode(ThemeMode::Dark)
             ->colors([

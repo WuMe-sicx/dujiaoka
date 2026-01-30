@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Service\BalanceService;
 use App\Service\CarmisService;
 use App\Service\CouponService;
 use App\Service\EmailtplService;
@@ -9,6 +10,7 @@ use App\Service\GoodsService;
 use App\Service\OrderProcessService;
 use App\Service\OrderService;
 use App\Service\PayService;
+use App\Service\PurchaseLimitService;
 use Illuminate\Support\ServiceProvider;
 use Jenssegers\Agent\Agent;
 
@@ -42,6 +44,12 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('Service\EmailtplService', function () {
             return $this->app->make(EmailtplService::class);
         });
+        $this->app->singleton('Service\PurchaseLimitService', function () {
+            return $this->app->make(PurchaseLimitService::class);
+        });
+        $this->app->singleton('Service\BalanceService', function () {
+            return $this->app->make(BalanceService::class);
+        });
         $this->app->singleton('Jenssegers\Agent', function () {
             return $this->app->make(Agent::class);
         });
@@ -55,6 +63,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-
+        \App\Models\Carmis::observe(\App\Observers\CarmisObserver::class);
     }
 }

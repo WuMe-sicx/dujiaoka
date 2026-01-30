@@ -91,6 +91,14 @@ return [
     'money_symbol' => '￥',
     'purchase_limit' => '每單限',
 
+    // 商品訪問密碼
+    'access_password_required' => '需要訪問密碼',
+    'access_password_hint' => '商品「:name」需要輸入訪問密碼才能查看和購買。',
+    'access_password' => '訪問密碼',
+    'enter_access_password' => '請輸入訪問密碼',
+    'verify_password' => '驗證密碼',
+    'back_to_home' => '返回首頁',
+
 
     'prompt' => [
         'server_illegal_request' => '非法請求！',
@@ -123,7 +131,13 @@ return [
         'search_order_browser_tips' => '最多只能查詢最近 5 筆訂單',
         'no_related_order_found_for_cache' => '未找到相關訂單快取！',
         'no_related_order_found' => '未找到相關訂單！',
-        'new_order_push' => '新訂單通知'
+        'new_order_push' => '新訂單通知',
+        'loop_carmis_limit' => '此商品最多購買一件！',
+        'access_password_incorrect' => '訪問密碼錯誤，請重新輸入',
+        'too_many_pending_orders' => '您有過多未支付訂單，請先完成或等待訂單過期後再試',
+        'user_purchase_limit_exceeded' => '已超過用戶購買限制（限購:limit件，已購:bought件）',
+        'ip_purchase_limit_exceeded' => '已超過今日IP購買限制（限購:limit件）',
+        'session_purchase_limit_exceeded' => '已超過會話購買限制（限購:limit件）',
     ],
 
     'equipment' => [
@@ -143,6 +157,7 @@ return [
         'home' => '首頁',
         'bill' => '訂單確認',
         'order-detail' => '訂單詳情',
-        'order-search' => '訂單查詢'
+        'order-search' => '訂單查詢',
+        'verify_password' => '驗證訪問密碼',
     ]
 ];

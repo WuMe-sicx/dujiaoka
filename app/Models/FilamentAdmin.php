@@ -2,14 +2,25 @@
 
 namespace App\Models;
 
-use Dcat\Admin\Models\Administrator;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
-use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class FilamentAdmin extends Administrator implements FilamentUser, Authenticatable
+class FilamentAdmin extends Authenticatable implements FilamentUser
 {
     protected $table = 'admin_users';
+
+    protected $fillable = [
+        'username',
+        'password',
+        'name',
+        'avatar',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
     /**
      * Determine if the user can access the Filament panel.
@@ -34,53 +45,5 @@ class FilamentAdmin extends Administrator implements FilamentUser, Authenticatab
     public function getAuthIdentifierName(): string
     {
         return 'username';
-    }
-
-    /**
-     * Get the unique identifier for the user.
-     */
-    public function getAuthIdentifier(): mixed
-    {
-        return $this->getAttribute($this->getAuthIdentifierName());
-    }
-
-    /**
-     * Get the password for the user.
-     */
-    public function getAuthPassword(): string
-    {
-        return $this->password;
-    }
-
-    /**
-     * Get the token value for the "remember me" session.
-     */
-    public function getRememberToken(): ?string
-    {
-        return $this->remember_token;
-    }
-
-    /**
-     * Set the token value for the "remember me" session.
-     */
-    public function setRememberToken($value): void
-    {
-        $this->remember_token = $value;
-    }
-
-    /**
-     * Get the column name for the "remember me" token.
-     */
-    public function getRememberTokenName(): string
-    {
-        return 'remember_token';
-    }
-
-    /**
-     * Get the password hash attribute for the user.
-     */
-    public function getAuthPasswordName(): string
-    {
-        return 'password';
     }
 }

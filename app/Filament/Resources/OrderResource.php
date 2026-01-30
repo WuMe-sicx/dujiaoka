@@ -7,8 +7,10 @@ use App\Models\Coupon;
 use App\Models\Goods;
 use App\Models\Order;
 use App\Models\Pay;
+use App\Service\OrderProcessService;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -117,7 +119,23 @@ class OrderResource extends Resource
                         Forms\Components\TextInput::make('actual_price')
                             ->label('实际价格')
                             ->disabled(),
+
+                        Forms\Components\TextInput::make('channel_fee')
+                            ->label('通道手续费')
+                            ->disabled(),
                     ])->columns(3),
+
+                Section::make('用户信息')
+                    ->schema([
+                        Forms\Components\Placeholder::make('user_name')
+                            ->label('关联用户')
+                            ->content(fn ($record) => $record?->user?->name ?? '游客'),
+
+                        Forms\Components\Placeholder::make('user_email')
+                            ->label('用户邮箱')
+                            ->content(fn ($record) => $record?->user?->email ?? '-'),
+                    ])->columns(2)
+                    ->visible(fn ($record) => $record?->user_id !== null),
 
                 Section::make('状态与配送')
                     ->schema([
@@ -207,6 +225,16 @@ class OrderResource extends Resource
                     ->limit(15)
                     ->toggleable(isToggledHiddenByDefault: true),
 
+                Tables\Columns\TextColumn::make('channel_fee')
+                    ->label('手续费')
+                    ->money('CNY')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('用户')
+                    ->placeholder('游客')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('status')
                     ->label('状态')
                     ->badge()
@@ -262,6 +290,62 @@ class OrderResource extends Resource
                     ->options(Pay::query()->pluck('pay_name', 'id')),
             ])
             ->actions([
+                Tables\Actions\Action::make('manual_complete')
+                    ->label('手动完成')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('手动完成订单')
+                    ->modalDescription('请填写发货信息，系统将标记订单为已完成并发送邮件通知买家。')
+                    ->form([
+                        Forms\Components\Textarea::make('delivery_info')
+                            ->label('发货信息')
+                            ->required()
+                            ->rows(5)
+                            ->helperText('卡密或发货内容，每行一个'),
+                        Forms\Components\Textarea::make('remark')
+                            ->label('操作备注')
+                            ->rows(2),
+                    ])
+                    ->action(function (Order $record, array $data): void {
+                        $record->status = Order::STATUS_COMPLETED;
+                        $record->info = $data['delivery_info'];
+                        $record->save();
+
+                        // 增加销量
+                        app('Service\GoodsService')->salesVolumeIncr($record->goods_id, $record->buy_amount);
+
+                        // 记录操作日志
+                        \Illuminate\Support\Facades\Log::info('订单手动补单完成', [
+                            'order_sn' => $record->order_sn,
+                            'operator' => auth()->user()?->name ?? 'Unknown',
+                            'remark' => $data['remark'] ?? '',
+                        ]);
+
+                        // 发送邮件通知
+                        if ($record->email) {
+                            try {
+                                \App\Jobs\MailSend::dispatch($record, 'completed');
+                            } catch (\Exception $e) {
+                                \Illuminate\Support\Facades\Log::error('手动补单邮件发送失败', [
+                                    'order_sn' => $record->order_sn,
+                                    'error' => $e->getMessage(),
+                                ]);
+                            }
+                        }
+
+                        Notification::make()
+                            ->title('订单已手动完成')
+                            ->body('邮件通知已发送给买家')
+                            ->success()
+                            ->send();
+                    })
+                    ->visible(fn (Order $record) => in_array($record->status, [
+                        Order::STATUS_WAIT_PAY,
+                        Order::STATUS_PENDING,
+                        Order::STATUS_PROCESSING,
+                        Order::STATUS_ABNORMAL,
+                    ])),
                 Actions\EditAction::make(),
                 Actions\DeleteAction::make(),
                 Actions\RestoreAction::make(),

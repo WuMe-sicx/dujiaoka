@@ -13,7 +13,6 @@
         "laravel/tinker": "^2.5",
         "mews/captcha": "^3.2",
         "paypal/paypal-server-sdk": "2.2.0",
-        "printnow/laravel-admin": "@dev",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "stripe/stripe-php": "^19.0",
         "torann/currency": "~1.1.5",
